@@ -210,10 +210,10 @@ cleanup_task = DummyOperator(
 
 # set the dependencies between tasks
 
-#init.set_downstream(sm_proc_preprocess_task)
-#sm_proc_preprocess_task.set_downstream(sm_proc_job_task)
-#sm_proc_job_task.set_downstream(preprocess_task)
-init.set_downstream(preprocess_task)
+init.set_downstream(sm_proc_preprocess_task)
+sm_proc_preprocess_task.set_downstream(sm_proc_job_task)
+sm_proc_job_task.set_downstream(preprocess_task)
+#init.set_downstream(preprocess_task)
 preprocess_task.set_downstream(prepare_task)
 prepare_task.set_downstream(train_model_task)
 train_model_task.set_downstream(batch_transform_task)
