@@ -34,7 +34,8 @@ from sagemaker.workflow.airflow import transform_config_from_estimator
 
 # ml workflow specific
 from pipeline import prepare, preprocess
-from pipeline import sm_proc_job, sm_proc_preprocess
+#from pipeline import sm_proc_job, sm_proc_preprocess
+from pipeline import sm_proc_job
 import config as cfg
 
 # =============================================================================
@@ -145,11 +146,11 @@ preprocess_task = PythonOperator(
     python_callable=preprocess.preprocess,
     op_kwargs=config["preprocess_data"])
 
-sm_proc_preprocess_task = PythonOperator(
-    task_id='sm_proc_preprocessing',
-    dag=dag,
-    provide_context=False,
-    python_callable=sm_proc_preprocess.sm_proc_preprocess)
+#sm_proc_preprocess_task = PythonOperator(
+#    task_id='sm_proc_preprocessing',
+#    dag=dag,
+#    provide_context=False,
+#    python_callable=sm_proc_preprocess.sm_proc_preprocess)
  #   op_kwargs=config["preprocess_data"])
 
 sm_proc_job_task = PythonOperator(
@@ -210,14 +211,17 @@ cleanup_task = DummyOperator(
 
 # set the dependencies between tasks
 
-init.set_downstream(sm_proc_preprocess_task)
-sm_proc_preprocess_task.set_downstream(sm_proc_job_task)
-sm_proc_job_task.set_downstream(preprocess_task)
+#init.set_downstream(sm_proc_preprocess_task)
+init.set_downstream(sm_proc_job_task)
+sm_proc_job_task.set_downstream(cleanup_task)
+#sm_proc_preprocess_task.set_downstream(sm_proc_job_task)
+#sm_proc_job_task.set_downstream(preprocess_task)
 #init.set_downstream(preprocess_task)
-preprocess_task.set_downstream(prepare_task)
-prepare_task.set_downstream(train_model_task)
-train_model_task.set_downstream(batch_transform_task)
-batch_transform_task.set_downstream(cleanup_task)
+#preprocess_task.set_downstream(prepare_task)
+#prepare_task.set_downstream(train_model_task)
+#train_model_task.set_downstream(batch_transform_task)
+#batch_transform_task.set_downstream(cleanup_task)
+
 
 #init.set_downstream(preprocess_task)
 #preprocess_task.set_downstream(prepare_task)
