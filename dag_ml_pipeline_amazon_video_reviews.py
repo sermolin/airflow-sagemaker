@@ -33,7 +33,7 @@ from sagemaker.workflow.airflow import tuning_config
 from sagemaker.workflow.airflow import transform_config_from_estimator
 
 # ml workflow specific
-from pipeline import prepare, preprocess
+#from pipeline import prepare, preprocess
 #from pipeline import sm_proc_job, sm_proc_preprocess
 from pipeline import sm_proc_job
 import config as cfg
