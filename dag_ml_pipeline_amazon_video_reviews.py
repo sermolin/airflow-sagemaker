@@ -139,12 +139,12 @@ init = DummyOperator(
 )
 
 # preprocess the data
-preprocess_task = PythonOperator(
-    task_id='preprocessing',
-    dag=dag,
-    provide_context=False,
-    python_callable=preprocess.preprocess,
-    op_kwargs=config["preprocess_data"])
+#preprocess_task = PythonOperator(
+#    task_id='preprocessing',
+#    dag=dag,
+#    provide_context=False,
+#    python_callable=preprocess.preprocess,
+#    op_kwargs=config["preprocess_data"])
 
 #sm_proc_preprocess_task = PythonOperator(
 #    task_id='sm_proc_preprocessing',
@@ -161,49 +161,49 @@ sm_proc_job_task = PythonOperator(
     op_kwargs= {'role': role, 'sess': sess})
 
 # prepare the data for training
-prepare_task = PythonOperator(
-    task_id='preparing',
-    dag=dag,
-    provide_context=False,
-    python_callable=prepare.prepare,
-    op_kwargs=config["prepare_data"]
-)
+#prepare_task = PythonOperator(
+#    task_id='preparing',
+#    dag=dag,
+#    provide_context=False,
+#    python_callable=prepare.prepare,
+#    op_kwargs=config["prepare_data"]
+#)
 
-branching = BranchPythonOperator(
-    task_id='branching',
-    dag=dag,
-    python_callable=lambda: "model_tuning" if hpo_enabled else "model_training")
+#branching = BranchPythonOperator(
+#    task_id='branching',
+#    dag=dag,
+#    python_callable=lambda: "model_tuning" if hpo_enabled else "model_training")
 
 # launch sagemaker training job and wait until it completes
-train_model_task = SageMakerTrainingOperator(
-    task_id='model_training',
-    dag=dag,
-    config=train_config,
-    aws_conn_id='airflow-sagemaker',
-    wait_for_completion=True,
-    check_interval=30
-)
+#train_model_task = SageMakerTrainingOperator(
+#    task_id='model_training',
+#    dag=dag,
+#    config=train_config,
+#    aws_conn_id='airflow-sagemaker',
+#    wait_for_completion=True,
+#    check_interval=30
+#)
 
 # launch sagemaker hyperparameter job and wait until it completes
-tune_model_task = SageMakerTuningOperator(
-    task_id='model_tuning',
-    dag=dag,
-    config=tuner_config,
-    aws_conn_id='airflow-sagemaker',
-    wait_for_completion=True,
-    check_interval=30
-)
+#tune_model_task = SageMakerTuningOperator(
+#    task_id='model_tuning',
+#    dag=dag,
+#    config=tuner_config,
+#    aws_conn_id='airflow-sagemaker',
+#    wait_for_completion=True,
+#    check_interval=30
+#)
 
 # launch sagemaker batch transform job and wait until it completes
-batch_transform_task = SageMakerTransformOperator(
-    task_id='predicting',
-    dag=dag,
-    config=transform_config,
-    aws_conn_id='airflow-sagemaker',
-    wait_for_completion=True,
-    check_interval=30,
-    trigger_rule=TriggerRule.ONE_SUCCESS
-)
+#batch_transform_task = SageMakerTransformOperator(
+#    task_id='predicting',
+#    dag=dag,
+#    config=transform_config,
+#    aws_conn_id='airflow-sagemaker',
+#    wait_for_completion=True,
+#    check_interval=30,
+#    trigger_rule=TriggerRule.ONE_SUCCESS
+#)
 
 cleanup_task = DummyOperator(
     task_id='cleaning_up',
