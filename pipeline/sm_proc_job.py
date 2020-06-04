@@ -40,9 +40,4 @@ def sm_proc_job (role, sess):
                                     max_runtime_in_seconds=1200,
                                     env={'mode': 'python'})
 
-  spark_processor.run(code='sm_proc_preprocess.py',
-                      arguments=['s3_input_bucket', bucket,
-                                 's3_input_key_prefix', input_prefix,
-                                 's3_output_bucket', bucket,
-                                 's3_output_key_prefix', input_preprocessed_prefix],
-                      logs=False)
+  spark_processor.run(code='smprocpreprocess.py', arguments=['s3_input_bucket', bucket, 's3_input_key_prefix', input_prefix, 's3_output_bucket', bucket, 's3_output_key_prefix', input_preprocessed_prefix], logs=False)
