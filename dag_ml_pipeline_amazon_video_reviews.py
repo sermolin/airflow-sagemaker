@@ -158,12 +158,13 @@ init = DummyOperator(
 #    python_callable=sm_proc_preprocess.sm_proc_preprocess)
  #   op_kwargs=config["preprocess_data"])
 
-sm_proc_job_task = PythonOperator(
-    task_id='sm_proc_job',
-    dag=dag,
-    provide_context=False,
-    python_callable=sm_proc_job.sm_proc_job,
-    op_kwargs= {'role': role, 'sess': sess})
+## commented out while debugging training
+##sm_proc_job_task = PythonOperator(
+##    task_id='sm_proc_job',
+##    dag=dag,
+##    provide_context=False,
+##    python_callable=sm_proc_job.sm_proc_job,
+##    op_kwargs= {'role': role, 'sess': sess})
 
 # prepare the data for training
 #prepare_task = PythonOperator(
@@ -180,14 +181,14 @@ sm_proc_job_task = PythonOperator(
 #    python_callable=lambda: "model_tuning" if hpo_enabled else "model_training")
 
 # launch sagemaker training job and wait until it completes
-#train_model_task = SageMakerTrainingOperator(
-#    task_id='model_training',
-#    dag=dag,
-#    config=train_config,
-#    aws_conn_id='airflow-sagemaker',
-#    wait_for_completion=True,
-#    check_interval=30
-#)
+train_model_task = SageMakerTrainingOperator(
+    task_id='model_training',
+    dag=dag,
+    config=train_config,
+    aws_conn_id='airflow-sagemaker',
+    wait_for_completion=True,
+    check_interval=30
+)
 
 # launch sagemaker hyperparameter job and wait until it completes
 #tune_model_task = SageMakerTuningOperator(
