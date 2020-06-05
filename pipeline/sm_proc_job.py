@@ -2,6 +2,8 @@
 import sagemaker
 from time import gmtime, strftime
 import boto3
+import os
+import sys
 
 def sm_proc_job (role, sess):
 
@@ -40,4 +42,4 @@ def sm_proc_job (role, sess):
                                     max_runtime_in_seconds=1200,
                                     env={'mode': 'python'})
 
-  spark_processor.run(code='smprocpreprocess.py', arguments=['s3_input_bucket', bucket, 's3_input_key_prefix', input_prefix, 's3_output_bucket', bucket, 's3_output_key_prefix', input_preprocessed_prefix], logs=False)
+  spark_processor.run(code='s3://airflow-sagemaker-2/smprocpreprocess.py', arguments=['s3_input_bucket', bucket, 's3_input_key_prefix', input_prefix, 's3_output_bucket', bucket, 's3_output_key_prefix', input_preprocessed_prefix], logs=False)
