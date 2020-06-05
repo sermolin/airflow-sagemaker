@@ -27,21 +27,24 @@ config["train_model"] = {
     "sagemaker_role": "AirflowSageMakerExecutionRole",
     "estimator_config": {
         "train_instance_count": 1,
-        "train_instance_type": "ml.c5.4xlarge",
-        "train_volume_size": 30,
+        "train_instance_type": "ml.m4.xlarge",
+        "train_volume_size": 20,
         "train_max_run": 3600,
-        "output_path": "s3://airflow-sagemaker-2/train/",  # replace
-        "base_job_name": "trng-recommender",
+        "output_path": "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/xgboost_model/output/",  # replace
+        "base_job_name": "c1-xgb-airflow",
         "hyperparameters": {
-            "feature_dim": "178729",
-            "epochs": "10",
-            "mini_batch_size": "200",
-            "num_factors": "64",
-            "predictor_type": 'regressor'
+            "objective" : "reg:linear",
+            "eta" : ".2",
+            "max_depth" : "5",
+            "num_round" : "10",
+            "subsample" : "0.7",
+            "silent"    : "0",
+            "min_child_weight" : "6"   
         }
     },
     "inputs": {
-        "train": "s3://airflow-sagemaker-2/prepare/train/train.protobuf",  # replace
+        "train": "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/2020-06-05-00-56-24/input/preprocessed/abalone/train/part-00000",
+        "validation": "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/2020-06-05-00-56-24/input/preprocessed/abalone/validation/part-00000"  # replace
     }
 }
 

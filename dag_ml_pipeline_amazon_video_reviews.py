@@ -75,11 +75,21 @@ sess = hook.get_session(region_name=region)
 role = get_sagemaker_role_arn(
     config["train_model"]["sagemaker_role"],
     sess.region_name)
-container = get_image_uri(sess.region_name, 'factorization-machines')
+#container = get_image_uri(sess.region_name, 'factorization-machines')
+container = get_image_uri(sess.region_name, 'xgboost', repo_version="0.90-1")
+
 hpo_enabled = is_hpo_enabled()
 
 # create estimator
-fm_estimator = Estimator(
+#fm_estimator = Estimator(
+#    image_name=container,
+#    role=role,
+#    sagemaker_session=sagemaker.session.Session(sess),
+#    **config["train_model"]["estimator_config"]
+#)
+
+# create XGB estimator
+xgb_estimator = Estimator(
     image_name=container,
     role=role,
     sagemaker_session=sagemaker.session.Session(sess),
@@ -88,27 +98,22 @@ fm_estimator = Estimator(
 
 # train_config specifies SageMaker training configuration
 train_config = training_config(
-    estimator=fm_estimator,
+    estimator=xgb_estimator,
     inputs=config["train_model"]["inputs"])
 
 # create tuner
-fm_tuner = HyperparameterTuner(
-    estimator=fm_estimator,
-    **config["tune_model"]["tuner_config"]
-)
-
-# create tuning config
-tuner_config = tuning_config(
-    tuner=fm_tuner,
-    inputs=config["tune_model"]["inputs"])
+#fm_tuner = HyperparameterTuner(
+#    estimator=fm_estimator,
+#    **config["tune_model"]["tuner_config"]
+#)
 
 # create transform config
-transform_config = transform_config_from_estimator(
-    estimator=fm_estimator,
-    task_id="model_tuning" if hpo_enabled else "model_training",
-    task_type="tuning" if hpo_enabled else "training",
-    **config["batch_transform"]["transform_config"]
-)
+#transform_config = transform_config_from_estimator(
+#    estimator=fm_estimator,
+#    task_id="model_tuning" if hpo_enabled else "model_training",
+#    task_type="tuning" if hpo_enabled else "training",
+#    **config["batch_transform"]["transform_config"]
+#)
 
 # =============================================================================
 # define airflow DAG and tasks
@@ -211,15 +216,16 @@ cleanup_task = DummyOperator(
 
 # set the dependencies between tasks
 
-#init.set_downstream(sm_proc_preprocess_task)
-init.set_downstream(sm_proc_job_task)
-sm_proc_job_task.set_downstream(cleanup_task)
+init.set_downstream(train_model_task)
+train_model_task.set_downstream(cleanup_task)
+##init.set_downstream(sm_proc_job_task)
+##sm_proc_job_task.set_downstream(cleanup_task)
 #sm_proc_preprocess_task.set_downstream(sm_proc_job_task)
 #sm_proc_job_task.set_downstream(preprocess_task)
 #init.set_downstream(preprocess_task)
 #preprocess_task.set_downstream(prepare_task)
 #prepare_task.set_downstream(train_model_task)
-#train_model_task.set_downstream(batch_transform_task)
+
 #batch_transform_task.set_downstream(cleanup_task)
 
 
