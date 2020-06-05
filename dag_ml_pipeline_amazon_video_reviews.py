@@ -230,10 +230,9 @@ cleanup_task = DummyOperator(
     dag=dag)
 
 # set the dependencies between tasks
-
-init.set_downstream(train_model_task)
+init.set_downstream(sm_proc_job_task)
+sm_proc_job_task.set_downstream(train_model_task)
 train_model_task.set_downstream(cleanup_task)
-##init.set_downstream(sm_proc_job_task)
 ##sm_proc_job_task.set_downstream(cleanup_task)
 #sm_proc_preprocess_task.set_downstream(sm_proc_job_task)
 #sm_proc_job_task.set_downstream(preprocess_task)
@@ -252,4 +251,8 @@ train_model_task.set_downstream(cleanup_task)
 #tune_model_task.set_downstream(batch_transform_task)
 #train_model_task.set_downstream(batch_transform_task)
 #batch_transform_task.set_downstream(cleanup_task)
+
+#TODO:
+# - pass output data directory from preprocessing to training (currently, s3_train_data and s3_validation_data are hard-coded)
+# - pass data_channels via config.py
 
