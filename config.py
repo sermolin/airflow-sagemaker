@@ -30,7 +30,7 @@ config["train_model"] = {
         "train_instance_type": "ml.m4.xlarge",
         "train_volume_size": 20,
         "train_max_run": 3600,
-        "output_path": "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/xgboost_model/output/",  # replace
+        "output_path": "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/xgboost_model/",  # replace
         "base_job_name": "c1-xgb-airflow",
         "hyperparameters": {
             "objective" : "reg:linear",
