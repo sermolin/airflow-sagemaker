@@ -15,7 +15,7 @@ def sm_proc_job (role, sess):
   timestamp_prefix = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
   prefix = 'sagemaker/spark-preprocess-demo/' + timestamp_prefix
-  input_prefix = prefix + '/input/raw/abalone'
+  input_prefix = 'sagemaker/spark-preprocess-demo/input/raw/abalone'
   input_preprocessed_prefix = prefix + '/input/preprocessed/abalone'
   model_prefix = prefix + '/model'
 
@@ -36,7 +36,7 @@ def sm_proc_job (role, sess):
                                     image_uri=spark_repository_uri,
                                     command=['/opt/program/submit'],
                                     role=role,
-                                    sagemaker_session=sess,
+                                    sagemaker_session=sagemaker.Session(sess),
                                     instance_count=2,
                                     instance_type='ml.r5.xlarge',
                                     max_runtime_in_seconds=1200,
