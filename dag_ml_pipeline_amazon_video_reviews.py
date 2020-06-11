@@ -112,12 +112,17 @@ xgb_estimator = Estimator(
 
 s3_train_data = "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/2020-06-05-00-56-24/input/preprocessed/abalone/train/part-00000"
 s3_validation_data = "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/2020-06-05-00-56-24/input/preprocessed/abalone/validation/part-00000"
+s3_test_data = "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/2020-06-05-00-56-24/input/preprocessed/abalone/test/preproc-test.csv"
 s3_uri_model_location = "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/xgboost_model/c1-xgb-airflow-2020-06-05-20-34-41-923/output/model.tar.gz"
 
 train_data = sagemaker.session.s3_input(s3_train_data, distribution='FullyReplicated', 
                         content_type='text/csv', s3_data_type='S3Prefix')
 validation_data = sagemaker.session.s3_input(s3_validation_data, distribution='FullyReplicated', 
                              content_type='text/csv', s3_data_type='S3Prefix')
+
+test_data = sagemaker.session.s3_input(s3_test_data, distribution='FullyReplicated', 
+                             content_type='text/csv', s3_data_type='S3Prefix')
+
 data_channels = {'train': train_data, 'validation': validation_data}
 
 train_config = training_config(
@@ -159,10 +164,12 @@ xgb_transformer = Transformer(
 
 transform_config = transform_config (
     transformer = xgb_transformer,
-    data = s3_validation_data,
+    data = s3_test_data,
+    content_type='text/csv',
+    split_type='Line',
+    #input_filter='$[1:]',
     data_type = 'S3Prefix'
     )
-
 
 # create transform config
 #transform_config = transform_config_from_estimator(
