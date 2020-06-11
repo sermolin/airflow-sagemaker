@@ -18,6 +18,9 @@ from airflow.contrib.operators.sagemaker_tuning_operator \
     import SageMakerTuningOperator
 from airflow.contrib.operators.sagemaker_transform_operator \
     import SageMakerTransformOperator
+from airflow.contrib.operators.sagemaker_model_operator \
+    import SageMakerModelOperator
+
 from airflow.contrib.hooks.aws_hook import AwsHook
 
 # sagemaker sdk
@@ -140,19 +143,10 @@ xgb_model = Model(
 #create model config
 model_config = model_config(
     instance_type = 'ml.c5.xlarge',
-    model = xbg_model,
+    model = xgb_model,
     role = role,
     image = container
     )
-
-compile_model_task = SageMakerModelOperator(
-    task_id='compile_model',
-    dag=dag,
-    config=model_config,
-    aws_conn_id='airflow-sagemaker',
-    wait_for_completion=True,
-    check_interval=30
-)
 
 # BATCH INFERENCE
 
@@ -169,16 +163,6 @@ transform_config = transform_config (
     data_type = 'S3Prefix'
     )
 
-#launch sagemaker batch transform job and wait until it completes
-batch_transform_task = SageMakerTransformOperator(
-    task_id='batch_predicting',
-    dag=dag,
-    config=transform_config,
-    aws_conn_id='airflow-sagemaker',
-    wait_for_completion=True,
-    check_interval=30,
-    trigger_rule=TriggerRule.ONE_SUCCESS
-)
 
 # create transform config
 #transform_config = transform_config_from_estimator(
@@ -272,6 +256,26 @@ train_model_task = SageMakerTrainingOperator(
 #    wait_for_completion=True,
 #    check_interval=30
 #)
+
+compile_model_task = SageMakerModelOperator(
+    task_id='compile_model',
+    dag=dag,
+    config=model_config,
+    aws_conn_id='airflow-sagemaker',
+    wait_for_completion=True,
+    check_interval=30
+)
+
+#launch sagemaker batch transform job and wait until it completes
+batch_transform_task = SageMakerTransformOperator(
+    task_id='batch_predicting',
+    dag=dag,
+    config=transform_config,
+    aws_conn_id='airflow-sagemaker',
+    wait_for_completion=True,
+    check_interval=30,
+    trigger_rule=TriggerRule.ONE_SUCCESS
+)
 
 cleanup_task = DummyOperator(
     task_id='cleaning_up',
