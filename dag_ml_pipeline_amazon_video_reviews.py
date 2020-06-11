@@ -2,6 +2,7 @@ from __future__ import print_function
 import json
 import requests
 from datetime import datetime
+from time import gmtime, strftime
 
 # airflow operators
 import airflow
@@ -85,7 +86,7 @@ role = get_sagemaker_role_arn(
     sess.region_name)
 #container = get_image_uri(sess.region_name, 'factorization-machines')
 container = get_image_uri(sess.region_name, 'xgboost', repo_version="0.90-1")
-
+timestamp_prefix = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 hpo_enabled = is_hpo_enabled()
 
 # create estimator
@@ -129,22 +130,17 @@ train_config = training_config(
     estimator=xgb_estimator,
     inputs=data_channels)
 
+model_name = 'xgb-model-abalone-spark-1'
+
 # MODEL COMPILATION
 xgb_model = Model(
     model_data = s3_uri_model_location,
     image = container,
     role = role,
-    name = 'xgb_model_abalone_spark',
+    name = model_name,
     sagemaker_session = sagemaker.session.Session(sess)
     )
 
-#xgb_model = FrameworkModel(
-#    model_data = s3_uri_model_location,
-#    image = container,
-#    role = role,
-#    entry_point = None,
-#    sagemaker_session = sagemaker.session.Session(sess)
-#    )
 
 #create model config
 model_config = model_config(
@@ -157,7 +153,7 @@ model_config = model_config(
 # BATCH INFERENCE
 
 xgb_transformer = Transformer(
-    model_name = 'xgb_model_abalone_spark', #### is this the right input, of not, then what?
+    model_name = model_name,
     instance_count = 1,
     instance_type = 'ml.c5.xlarge',
     sagemaker_session = sagemaker.session.Session(sess)
@@ -165,6 +161,7 @@ xgb_transformer = Transformer(
 
 transform_config = transform_config (
     transformer = xgb_transformer,
+    job_name = 'xgb-tranform-job-' + timestamp_prefix,
     data = s3_test_data,
     content_type='text/csv',
     split_type='Line',
