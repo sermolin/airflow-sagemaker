@@ -134,6 +134,7 @@ xgb_model = Model(
     model_data = s3_uri_model_location,
     image = container,
     role = role,
+    name = 'xgb_model_abalone_spark',
     sagemaker_session = sagemaker.session.Session(sess)
     )
 
@@ -156,7 +157,7 @@ model_config = model_config(
 # BATCH INFERENCE
 
 xgb_transformer = Transformer(
-    model_name = xgb_model, #### is this the right input, of not, then what?
+    model_name = 'xgb_model_abalone_spark', #### is this the right input, of not, then what?
     instance_count = 1,
     instance_type = 'ml.c5.xlarge',
     sagemaker_session = sagemaker.session.Session(sess)
