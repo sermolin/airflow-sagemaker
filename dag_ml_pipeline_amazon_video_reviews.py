@@ -15,12 +15,14 @@ from airflow.operators.python_operator import PythonOperator
 # airflow sagemaker operators
 from airflow.contrib.operators.sagemaker_training_operator \
     import SageMakerTrainingOperator
-from airflow.contrib.operators.sagemaker_tuning_operator \
-    import SageMakerTuningOperator
+#from airflow.contrib.operators.sagemaker_tuning_operator \
+#    import SageMakerTuningOperator
 from airflow.contrib.operators.sagemaker_transform_operator \
     import SageMakerTransformOperator
 from airflow.contrib.operators.sagemaker_model_operator \
     import SageMakerModelOperator
+from airflow.contrib.operators.sagemaker_model_operator \
+    import SageMakerEndpointOperator
 
 from airflow.contrib.hooks.aws_hook import AwsHook
 
@@ -29,10 +31,12 @@ import boto3
 import sagemaker
 from sagemaker.amazon.amazon_estimator import get_image_uri
 from sagemaker.estimator import Estimator
-from sagemaker.tuner import HyperparameterTuner
-from sagemaker.model import FrameworkModel
+#from sagemaker.tuner import HyperparameterTuner
+#from sagemaker.model import FrameworkModel
 from sagemaker.model import Model
 from sagemaker.transformer import Transformer
+from sagemaker.pipeline import PipelineModel
+from sagemaker.sparkml.model import SparkMLModel
 
 # airflow sagemaker configuration
 from sagemaker.workflow.airflow import training_config
@@ -40,12 +44,14 @@ from sagemaker.workflow.airflow import tuning_config
 from sagemaker.workflow.airflow import transform_config_from_estimator
 from sagemaker.workflow.airflow import model_config 
 from sagemaker.workflow.airflow import transform_config 
+from sagemaker.workflow.airflow import deploy_config
 
 # ml workflow specific
 #from pipeline import prepare, preprocess
 #from pipeline import sm_proc_job, sm_proc_preprocess
 from pipeline import sm_proc_job
 import config as cfg
+import schema_utils
 
 # =============================================================================
 # functions
@@ -73,7 +79,6 @@ def get_sagemaker_role_arn(role_name, region_name):
 # setting up training, tuning and transform configuration
 # =============================================================================
 
-
 # read config file
 config = cfg.config
 
@@ -84,22 +89,14 @@ sess = hook.get_session(region_name=region)
 role = get_sagemaker_role_arn(
     config["train_model"]["sagemaker_role"],
     sess.region_name)
-#container = get_image_uri(sess.region_name, 'factorization-machines')
-container = get_image_uri(sess.region_name, 'xgboost', repo_version="0.90-1")
+
+xgb_container = get_image_uri(sess.region_name, 'xgboost', repo_version="0.90-1")
 timestamp_prefix = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 hpo_enabled = is_hpo_enabled()
 
-# create estimator
-#fm_estimator = Estimator(
-#    image_name=container,
-#    role=role,
-#    sagemaker_session=sagemaker.session.Session(sess),
-#    **config["train_model"]["estimator_config"]
-#)
-
 # create XGB estimator
 xgb_estimator = Estimator(
-    image_name=container,
+    image_name=xgb_container,
     role=role,
     sagemaker_session=sagemaker.session.Session(sess),
     **config["train_model"]["estimator_config"]
@@ -115,6 +112,8 @@ s3_train_data = "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/2020-0
 s3_validation_data = "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/2020-06-05-00-56-24/input/preprocessed/abalone/validation/part-00000"
 s3_test_data = "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/2020-06-05-00-56-24/input/preprocessed/abalone/test/preproc-test.csv"
 s3_uri_model_location = "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/xgboost_model/c1-xgb-airflow-2020-06-05-20-34-41-923/output/model.tar.gz"
+s3_sparkml_data = "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/2020-06-13-00-22-56/mleap-model/model.tar.gz"
+#s3_sparkml_data = "s3://sagemaker-us-east-1-328296961357/sagemaker/spark-preprocess-demo/2020-06-12-18-31-52/mleap-model/model.tar.gz"
 
 train_data = sagemaker.session.s3_input(s3_train_data, distribution='FullyReplicated', 
                         content_type='text/csv', s3_data_type='S3Prefix')
@@ -131,23 +130,23 @@ train_config = training_config(
     inputs=data_channels)
 
 model_name = 'xgb-model-abalone-spark-1'
+schema_json = schema_utils.abalone_schema()
 
 # MODEL COMPILATION
 xgb_model = Model(
     model_data = s3_uri_model_location,
-    image = container,
+    image = xgb_container,
     role = role,
     name = model_name,
     sagemaker_session = sagemaker.session.Session(sess)
     )
 
-
 #create model config
-model_config = model_config(
+xgb_model_config = model_config(
     instance_type = 'ml.c5.xlarge',
     model = xgb_model,
     role = role,
-    image = container
+    image = xgb_container
     )
 
 # BATCH INFERENCE
@@ -169,13 +168,29 @@ transform_config = transform_config (
     data_type = 'S3Prefix'
     )
 
-# create transform config
-#transform_config = transform_config_from_estimator(
-#    estimator=fm_estimator,
-#    task_id="model_tuning" if hpo_enabled else "model_training",
-#    task_type="tuning" if hpo_enabled else "training",
-#    **config["batch_transform"]["transform_config"]
-#)
+# REAL-TIME INFERENCE
+# passing the schema defined above by using an environment variable that sagemaker-sparkml-serving understands
+sparkml_model = SparkMLModel(model_data=s3_sparkml_data, env={'SAGEMAKER_SPARKML_SCHEMA' : schema_json})
+#xgb_model = Model(model_data=s3_uri_model_location, image=training_image) #if compiling the model 1st time
+pipline_model_name = 'inference-pipeline-' + timestamp_prefix
+sm_model = PipelineModel(name=pipline_model_name, role=role, sagemaker_session = sagemaker.session.Session(sess), models=[sparkml_model, xgb_model])
+endpoint_name = 'inference-pipeline-ep-' + timestamp_prefix
+#sm_model.deploy(initial_instance_count=1, instance_type='ml.c4.xlarge', endpoint_name=endpoint_name)
+
+#create model config
+#pipeline_model_config = model_config(
+#    instance_type = 'ml.c5.xlarge',
+#    model = sm_model,
+#    role = role
+#    )
+
+pipeline_deploy_config = deploy_config(
+    model = sm_model,
+    initial_instance_count = 1,
+    instance_type = 'ml.c5.xlarge',
+    endpoint_name = endpoint_name
+    )
+
 
 # =============================================================================
 # define airflow DAG and tasks
@@ -205,42 +220,12 @@ init = DummyOperator(
     dag=dag
 )
 
-# preprocess the data
-#preprocess_task = PythonOperator(
-#    task_id='preprocessing',
-#    dag=dag,
-#    provide_context=False,
-#    python_callable=preprocess.preprocess,
-#    op_kwargs=config["preprocess_data"])
-
-#sm_proc_preprocess_task = PythonOperator(
-#    task_id='sm_proc_preprocessing',
-#    dag=dag,
-#    provide_context=False,
-#    python_callable=sm_proc_preprocess.sm_proc_preprocess)
- #   op_kwargs=config["preprocess_data"])
-
-
 ##sm_proc_job_task = PythonOperator(
 ##    task_id='sm_proc_job',
 ##    dag=dag,
 ##    provide_context=False,
 ##    python_callable=sm_proc_job.sm_proc_job,
 ##    op_kwargs= {'role': role, 'sess': sess})
-
-# prepare the data for training
-#prepare_task = PythonOperator(
-#    task_id='preparing',
-#    dag=dag,
-#    provide_context=False,
-#    python_callable=prepare.prepare,
-#    op_kwargs=config["prepare_data"]
-#)
-
-#branching = BranchPythonOperator(
-#    task_id='branching',
-#    dag=dag,
-#    python_callable=lambda: "model_tuning" if hpo_enabled else "model_training")
 
 # launch sagemaker training job and wait until it completes
 ##train_model_task = SageMakerTrainingOperator(
@@ -252,45 +237,53 @@ init = DummyOperator(
 ##    check_interval=30
 ##)
 
-# launch sagemaker hyperparameter job and wait until it completes
-#tune_model_task = SageMakerTuningOperator(
-#    task_id='model_tuning',
+##compile_model_task = SageMakerModelOperator(
+##    task_id='compile_model',
+##    dag=dag,
+##    config=xgb_model_config,
+##    aws_conn_id='airflow-sagemaker',
+##    wait_for_completion=True,
+##    check_interval=30
+##)
+
+#launch sagemaker batch transform job and wait until it completes
+##batch_transform_task = SageMakerTransformOperator(
+##    task_id='batch_predicting',
+##    dag=dag,
+##    config=transform_config,
+##    aws_conn_id='airflow-sagemaker',
+##    wait_for_completion=True,
+##    check_interval=30
+##)
+
+#compile_pipeline_model_task = SageMakerModelOperator(
+#    task_id='compile_pipeline_model',
 #    dag=dag,
-#    config=tuner_config,
+#    config=pipeline_model_config,
 #    aws_conn_id='airflow-sagemaker',
 #    wait_for_completion=True,
 #    check_interval=30
 #)
 
-compile_model_task = SageMakerModelOperator(
-    task_id='compile_model',
+create_endpoint_task = SageMakerEndpointOperator(
+    task_id='create_endpoint',
     dag=dag,
-    config=model_config,
+    config=pipeline_deploy_config,
     aws_conn_id='airflow-sagemaker',
     wait_for_completion=True,
-    check_interval=30
-)
-
-#launch sagemaker batch transform job and wait until it completes
-batch_transform_task = SageMakerTransformOperator(
-    task_id='batch_predicting',
-    dag=dag,
-    config=transform_config,
-    aws_conn_id='airflow-sagemaker',
-    wait_for_completion=True,
-    check_interval=30
-#,
-#    trigger_rule=TriggerRule.ONE_SUCCESS
-)
+    check_interval=30)
 
 cleanup_task = DummyOperator(
     task_id='cleaning_up',
     dag=dag)
 
 # set the dependencies between tasks
-init.set_downstream(compile_model_task)
-compile_model_task.set_downstream(batch_transform_task)
-batch_transform_task.set_downstream(cleanup_task)
+init.set_downstream(create_endpoint_task)
+create_endpoint_task.set_downstream(cleanup_task)
+
+#init.set_downstream(compile_model_task)
+#compile_model_task.set_downstream(batch_transform_task)
+#batch_transform_task.set_downstream(cleanup_task)
 
 #init.set_downstream(sm_proc_job_task)
 #sm_proc_job_task.set_downstream(train_model_task)
