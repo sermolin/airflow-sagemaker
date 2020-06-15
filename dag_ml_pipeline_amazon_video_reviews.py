@@ -21,8 +21,7 @@ from airflow.contrib.operators.sagemaker_transform_operator \
     import SageMakerTransformOperator
 from airflow.contrib.operators.sagemaker_model_operator \
     import SageMakerModelOperator
-from airflow.contrib.operators.sagemaker_model_operator \
-    import SageMakerEndpointOperator
+from airflow.contrib.operators.sagemaker_endpoint_operator import SageMakerEndpointOperator
 
 from airflow.contrib.hooks.aws_hook import AwsHook
 
