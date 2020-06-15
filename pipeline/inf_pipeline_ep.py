@@ -10,7 +10,7 @@ import sys
 import schema_utils
 
 
-def inf_pipeline_ep (role, sess):
+def inf_pipeline_ep (role, sess): 
 
   #sagemaker_session = sagemaker.Session()
   #role = sagemaker.get_execution_role()
