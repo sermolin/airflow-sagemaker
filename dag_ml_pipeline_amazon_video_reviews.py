@@ -15,13 +15,14 @@ from airflow.operators.python_operator import PythonOperator
 # airflow sagemaker operators
 from airflow.contrib.operators.sagemaker_training_operator \
     import SageMakerTrainingOperator
-#from airflow.contrib.operators.sagemaker_tuning_operator \
-#    import SageMakerTuningOperator
+from airflow.contrib.operators.sagemaker_tuning_operator \
+    import SageMakerTuningOperator
 from airflow.contrib.operators.sagemaker_transform_operator \
     import SageMakerTransformOperator
 from airflow.contrib.operators.sagemaker_model_operator \
     import SageMakerModelOperator
-from airflow.contrib.operators.sagemaker_endpoint_operator import SageMakerEndpointOperator
+from airflow.contrib.operators.sagemaker_endpoint_operator \
+    import SageMakerEndpointOperator
 
 from airflow.contrib.hooks.aws_hook import AwsHook
 
@@ -169,7 +170,8 @@ transform_config = transform_config (
 
 # REAL-TIME INFERENCE
 # passing the schema defined above by using an environment variable that sagemaker-sparkml-serving understands
-sparkml_model = SparkMLModel(model_data=s3_sparkml_data, env={'SAGEMAKER_SPARKML_SCHEMA' : schema_json})
+#sparkml_model = SparkMLModel(model_data=s3_sparkml_data, env={'SAGEMAKER_SPARKML_SCHEMA' : schema_json})
+sparkml_model = SparkMLModel(model_data=s3_sparkml_data,  role=role, sagemaker_session = sagemaker.session.Session(sess), env={'SAGEMAKER_SPARKML_SCHEMA' : schema_json})
 #xgb_model = Model(model_data=s3_uri_model_location, image=training_image) #if compiling the model 1st time
 pipline_model_name = 'inference-pipeline-' + timestamp_prefix
 sm_model = PipelineModel(name=pipline_model_name, role=role, sagemaker_session = sagemaker.session.Session(sess), models=[sparkml_model, xgb_model])
