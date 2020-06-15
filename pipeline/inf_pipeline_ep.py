@@ -1,4 +1,4 @@
-#sm_proc_job.py
+#inf_pipeline_ep.py
 import sagemaker
 from sagemaker.pipeline import PipelineModel
 from sagemaker.sparkml.model import SparkMLModel
@@ -27,19 +27,9 @@ def inf_pipeline_ep (role, sess):
   spark_repository_uri = '328296961357.dkr.ecr.us-east-1.amazonaws.com/sagemaker-spark-example:latest'
   s3_uri_model_location = "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/xgboost_model/c1-xgb-airflow-2020-06-05-20-34-41-923/output/model.tar.gz"
   s3_sparkml_data = "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/2020-06-13-00-22-56/mleap-model/model.tar.gz"
- 
-
-  #account_id = boto3.client('sts').get_caller_identity().get('Account')
-  #region = boto3.session.Session().region_name
-  #ecr_repository = 'sagemaker-spark-example'
-  #tag = ':latest'
-  #uri_suffix = 'amazonaws.com'
-  #spark_repository_uri = '{}.dkr.ecr.{}.{}/{}'.format(account_id, region, uri_suffix, ecr_repository + tag)
-  #prebuilt container
   
   model_name = 'xgb-model-abalone-spark-1'
   schema_json = schema_utils.abalone_schema()
-
 
   #REAL-TIME INFERENCE
   # passing the schema defined above by using an environment variable that sagemaker-sparkml-serving understands
