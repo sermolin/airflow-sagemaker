@@ -50,6 +50,7 @@ from sagemaker.workflow.airflow import deploy_config
 #from pipeline import prepare, preprocess
 #from pipeline import sm_proc_job, sm_proc_preprocess
 from pipeline import sm_proc_job
+from pipeline import inf_pipeline_ep
 import config as cfg
 import schema_utils
 
@@ -271,13 +272,20 @@ init = DummyOperator(
 #    check_interval=30
 #)
 
-create_endpoint_task = SageMakerEndpointOperator(
+#create_endpoint_task = SageMakerEndpointOperator(
+#    task_id='create_endpoint',
+#    dag=dag,
+#    config=pipeline_deploy_config,
+#    aws_conn_id='airflow-sagemaker',
+#    wait_for_completion=True,
+#    check_interval=30)
+
+create_endpoint_task = PythonOperator(
     task_id='create_endpoint',
     dag=dag,
-    config=pipeline_deploy_config,
-    aws_conn_id='airflow-sagemaker',
-    wait_for_completion=True,
-    check_interval=30)
+    provide_context=False,
+    python_callable=inf_pipeline_ep.inf_pipeline_ep,
+    op_kwargs= {'role': role, 'sess': sess})
 
 cleanup_task = DummyOperator(
     task_id='cleaning_up',
