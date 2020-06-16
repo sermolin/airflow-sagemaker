@@ -10,15 +10,15 @@ config["job_level"] = {
 
 config["preprocess_data"] = {
     "s3_in_url": "s3://amazon-reviews-pds/tsv/amazon_reviews_us_Digital_Video_Download_v1_00.tsv.gz",
-    "s3_out_bucket": "airflow-sagemaker-2",  # replace
+    "s3_out_bucket": "airflow-sagemaker-jeprk",  # replace
     "s3_out_prefix": "preprocess/",
     "delimiter": "\t"
 }
 
 config["prepare_data"] = {
-    "s3_in_bucket": "airflow-sagemaker-2",  # replace
+    "s3_in_bucket": "airflow-sagemaker-jeprk",  # replace
     "s3_in_prefix": "preprocess/",
-    "s3_out_bucket": "airflow-sagemaker-2",  # replace
+    "s3_out_bucket": "airflow-sagemaker-jeprk",  # replace
     "s3_out_prefix": "prepare/",
     "delimiter": "\t"
 }
@@ -30,7 +30,7 @@ config["train_model"] = {
         "train_instance_type": "ml.m4.xlarge",
         "train_volume_size": 20,
         "train_max_run": 3600,
-        # "output_path": "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/xgboost_model/",  # replace
+        # "output_path": "s3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/xgboost_model/",  # replace
         "output_path": "s3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/xgboost_model",
         "base_job_name": "c1-xgb-airflow",
         "hyperparameters": {
@@ -44,8 +44,8 @@ config["train_model"] = {
         }
     },
     "inputs": {
-        "train": "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/2020-06-05-00-56-24/input/preprocessed/abalone/train/part-00000",
-        "validation": "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/2020-06-05-00-56-24/input/preprocessed/abalone/validation/part-00000"  # replace
+        "train": "s3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/2020-06-05-00-56-24/input/preprocessed/abalone/train/part-00000",
+        "validation": "s3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/2020-06-05-00-56-24/input/preprocessed/abalone/validation/part-00000"  # replace
     }
 }
 
@@ -62,8 +62,8 @@ config["tune_model"] = {
         "base_tuning_job_name": "hpo-recommender"
     },
     "inputs": {
-        "train": "s3://airflow-sagemaker-2/prepare/train/train.protobuf",  # replace
-        "test": "s3://airflow-sagemaker-2/prepare/validate/validate.protobuf"  # replace
+        "train": "s3://airflow-sagemaker-jeprk/prepare/train/train.protobuf",  # replace
+        "test": "s3://airflow-sagemaker-jeprk/prepare/validate/validate.protobuf"  # replace
     }
 }
 
@@ -71,10 +71,10 @@ config["batch_transform"] = {
     "transform_config": {
         "instance_count": 1,
         "instance_type": "ml.c4.xlarge",
-        "data": "s3://airflow-sagemaker-2/prepare/test/",
+        "data": "s3://airflow-sagemaker-jeprk/prepare/test/",
         "data_type": "S3Prefix",
         "content_type": "application/x-recordio-protobuf",
         "strategy": "MultiRecord",
-        "output_path": "s3://airflow-sagemaker-2/transform/"
+        "output_path": "s3://airflow-sagemaker-jeprk/transform/"
     }
 }

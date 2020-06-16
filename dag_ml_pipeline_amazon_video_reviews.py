@@ -177,7 +177,7 @@ transform_config = transform_config(
 # REAL-TIME INFERENCE
 # passing the schema defined above by using an environment variable that sagemaker-sparkml-serving understands
 #sparkml_model = SparkMLModel(model_data=s3_sparkml_data, env={'SAGEMAKER_SPARKML_SCHEMA' : schema_json})
-<< << << < HEAD
+
 sparkml_model = SparkMLModel(model_data=s3_sparkml_data,  role=role, sagemaker_session=sagemaker.session.Session(
     sess), env={'SAGEMAKER_SPARKML_SCHEMA': schema_json})
 # xgb_model = Model(model_data=s3_uri_model_location, image=training_image) #if compiling the model 1st time
@@ -186,7 +186,7 @@ sm_model = PipelineModel(name=pipline_model_name,
                          role=role,
                          sagemaker_session=sagemaker.session.Session(sess),
                          models=[sparkml_model, xgb_model])
-== == == =
+
 #sparkml_model = SparkMLModel(model_data=s3_sparkml_data,  role=role, sagemaker_session = sagemaker.session.Session(sess), env={'SAGEMAKER_SPARKML_SCHEMA' : schema_json})
 # xgb_model = Model(model_data=s3_uri_model_location, image=training_image) #if compiling the model 1st time
 #pipline_model_name = 'inference-pipeline-' + timestamp_prefix
@@ -194,7 +194,6 @@ sm_model = PipelineModel(name=pipline_model_name,
 #    role=role,
 #    sagemaker_session = sagemaker.session.Session(sess),
 #    models=[sparkml_model, xgb_model])
->>>>>> > sm-processing
 
 #endpoint_name = 'inference-pipeline-ep-' + timestamp_prefix
 #sm_model.deploy(initial_instance_count=1, instance_type='ml.c4.xlarge', endpoint_name=endpoint_name)
@@ -206,7 +205,6 @@ sm_model = PipelineModel(name=pipline_model_name,
 #    role = role
 #    )
 
-<< << << < HEAD
 # Create custom python operator airflow
 
 
@@ -216,20 +214,9 @@ def pipeline_deploy_config():
                     instance_type='ml.c4.xlarge', endpoint_name=endpoint_name)
 
 
-== == == =
-# pipeline_deploy_config = deploy_config(
-#    model = sm_model,
-#    model = sparkml_model,
-#    initial_instance_count = 1,
-#    instance_type = 'ml.c5.xlarge',
-#    endpoint_name = endpoint_name
-#    )
->>>>>> > sm-processing
-
 # =============================================================================
 # define airflow DAG and tasks
 # =============================================================================
-
 # define airflow DAG
 args = {
     'owner': 'airflow',

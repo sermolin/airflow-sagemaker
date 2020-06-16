@@ -14,8 +14,6 @@ from pyspark.ml import Pipeline
 from pyspark.sql.types import StructField, StructType, StringType, DoubleType
 from pyspark.ml.feature import StringIndexer, VectorIndexer, OneHotEncoder, VectorAssembler
 from pyspark.sql.functions import *
-
-# Import simple serializer
 from mleap.pyspark.spark_support import SimpleSparkSerializer
 
 
