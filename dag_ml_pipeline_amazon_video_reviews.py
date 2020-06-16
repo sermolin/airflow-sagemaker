@@ -51,7 +51,9 @@ from sagemaker.workflow.airflow import deploy_config
 #from pipeline import sm_proc_job, sm_proc_preprocess
 #
 from pipeline import sm_proc_job
-from pipeline import inf_pipeline_ep
+import inference_pipeline_ep
+#
+
 import config as cfg
 import schema_utils
 
@@ -283,7 +285,7 @@ create_endpoint_task = PythonOperator(
     task_id='create_endpoint',
     dag=dag,
     provide_context=False,
-    python_callable=inf_pipeline_ep.inf_pipeline_ep,
+    python_callable=inference_pipeline_ep.inference_pipeline_ep,
     op_kwargs= {'role': role, 'sess': sess})
 
 cleanup_task = DummyOperator(

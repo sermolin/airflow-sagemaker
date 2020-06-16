@@ -1,4 +1,3 @@
-#inf_pipeline_ep.py
 import sagemaker
 from sagemaker.pipeline import PipelineModel
 from sagemaker.sparkml.model import SparkMLModel
@@ -7,10 +6,8 @@ from time import gmtime, strftime
 import boto3
 import os
 import sys
-import schema_utils
 
-
-def inf_pipeline_ep (role, sess): 
+def inference_pipeline_ep (role, sess): 
 
   #sagemaker_session = sagemaker.Session()
   #role = sagemaker.get_execution_role()
@@ -44,3 +41,4 @@ def inf_pipeline_ep (role, sess):
 
   endpoint_name = 'inference-pipeline-ep-' + timestamp_prefix
   sm_model.deploy(initial_instance_count=1, instance_type='ml.c4.xlarge', endpoint_name=endpoint_name)
+
