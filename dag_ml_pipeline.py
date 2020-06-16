@@ -90,13 +90,6 @@ role = get_sagemaker_role_arn(
     config["train_model"]["sagemaker_role"],
     sess.region_name)
 
-
-def pipeline_deploy_config():
-    endpoint_name = 'inference-pipeline-ep-' + timestamp_prefix
-    sm_model.deploy(initial_instance_count=1,
-                    instance_type='ml.c4.xlarge', endpoint_name=endpoint_name)
-
-
 # =============================================================================
 # define airflow DAG and tasks
 # =============================================================================
