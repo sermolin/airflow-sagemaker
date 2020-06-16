@@ -49,14 +49,17 @@ from sagemaker.workflow.airflow import deploy_config
 # ml workflow specific
 #from pipeline import prepare, preprocess
 #from pipeline import sm_proc_job, sm_proc_preprocess
+#
 from pipeline import sm_proc_job
+import inference_pipeline_ep
+#
+
 import config as cfg
 import schema_utils
 
 # =============================================================================
 # functions
 # =============================================================================
-
 
 def is_hpo_enabled():
     """check if hyper-parameter optimization is enabled in the config
@@ -173,6 +176,7 @@ transform_config = transform_config(
 # REAL-TIME INFERENCE
 # passing the schema defined above by using an environment variable that sagemaker-sparkml-serving understands
 #sparkml_model = SparkMLModel(model_data=s3_sparkml_data, env={'SAGEMAKER_SPARKML_SCHEMA' : schema_json})
+<<<<<<< HEAD
 sparkml_model = SparkMLModel(model_data=s3_sparkml_data,  role=role, sagemaker_session=sagemaker.session.Session(
     sess), env={'SAGEMAKER_SPARKML_SCHEMA': schema_json})
 # xgb_model = Model(model_data=s3_uri_model_location, image=training_image) #if compiling the model 1st time
@@ -181,8 +185,17 @@ sm_model = PipelineModel(name=pipline_model_name,
                          role=role,
                          sagemaker_session=sagemaker.session.Session(sess),
                          models=[sparkml_model, xgb_model])
+=======
+#sparkml_model = SparkMLModel(model_data=s3_sparkml_data,  role=role, sagemaker_session = sagemaker.session.Session(sess), env={'SAGEMAKER_SPARKML_SCHEMA' : schema_json})
+#xgb_model = Model(model_data=s3_uri_model_location, image=training_image) #if compiling the model 1st time
+#pipline_model_name = 'inference-pipeline-' + timestamp_prefix
+#sm_model = PipelineModel(name=pipline_model_name, 
+#    role=role, 
+#    sagemaker_session = sagemaker.session.Session(sess), 
+#    models=[sparkml_model, xgb_model])
+>>>>>>> sm-processing
 
-endpoint_name = 'inference-pipeline-ep-' + timestamp_prefix
+#endpoint_name = 'inference-pipeline-ep-' + timestamp_prefix
 #sm_model.deploy(initial_instance_count=1, instance_type='ml.c4.xlarge', endpoint_name=endpoint_name)
 
 # create model config
@@ -192,6 +205,7 @@ endpoint_name = 'inference-pipeline-ep-' + timestamp_prefix
 #    role = role
 #    )
 
+<<<<<<< HEAD
 # Create custom python operator airflow
 
 
@@ -200,6 +214,15 @@ def pipeline_deploy_config():
     sm_model.deploy(initial_instance_count=1,
                     instance_type='ml.c4.xlarge', endpoint_name=endpoint_name)
 
+=======
+#pipeline_deploy_config = deploy_config(
+#    model = sm_model,
+#    model = sparkml_model,
+#    initial_instance_count = 1,
+#    instance_type = 'ml.c5.xlarge',
+#    endpoint_name = endpoint_name
+#    )
+>>>>>>> sm-processing
 
 # =============================================================================
 # define airflow DAG and tasks
@@ -212,7 +235,7 @@ args = {
 }
 
 dag = DAG(
-    dag_id='sagemaker-ml-pipeline-proc-3',
+    dag_id='sagemaker-ml-pipeline-proc-5',
     default_args=args,
     schedule_interval=None,
     concurrency=1,
@@ -271,6 +294,7 @@ init = DummyOperator(
 #    aws_conn_id='airflow-sagemaker',
 #    wait_for_completion=True,
 #    check_interval=30
+<<<<<<< HEAD
 # )
 
 # create_endpoint_task = SageMakerEndpointOperator(
@@ -286,6 +310,24 @@ create_pipeline_endpoint_task = PythonOperator(
     python_callable=pipeline_deploy_config,
     dag=dag
 )
+=======
+#)
+
+#create_endpoint_task = SageMakerEndpointOperator(
+#    task_id='create_endpoint',
+#    dag=dag,
+#    config=pipeline_deploy_config,
+#    aws_conn_id='airflow-sagemaker',
+#    wait_for_completion=True,
+#    check_interval=30)
+
+create_endpoint_task = PythonOperator(
+    task_id='create_endpoint',
+    dag=dag,
+    provide_context=False,
+    python_callable=inference_pipeline_ep.inference_pipeline_ep,
+    op_kwargs= {'role': role, 'sess': sess})
+>>>>>>> sm-processing
 
 cleanup_task = DummyOperator(
     task_id='cleaning_up',
