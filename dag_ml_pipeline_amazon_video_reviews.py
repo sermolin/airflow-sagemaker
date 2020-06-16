@@ -212,7 +212,7 @@ args = {
 }
 
 dag = DAG(
-    dag_id='sagemaker-ml-pipeline-proc-3',
+    dag_id='sagemaker-ml-pipeline-proc-5',
     default_args=args,
     schedule_interval=None,
     concurrency=1,

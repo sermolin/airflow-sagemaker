@@ -25,14 +25,14 @@ def inference_pipeline_ep (role, sess):
   s3_uri_model_location = "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/xgboost_model/c1-xgb-airflow-2020-06-05-20-34-41-923/output/model.tar.gz"
   s3_sparkml_data = "s3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/2020-06-13-00-22-56/mleap-model/model.tar.gz"
   
-  model_name = 'xgb-model-abalone-spark-1'
+  model_name = 'xgb-model-abalone-spark-2'
   schema_json = schema_utils.abalone_schema()
 
   #REAL-TIME INFERENCE
   # passing the schema defined above by using an environment variable that sagemaker-sparkml-serving understands
   #sparkml_model = SparkMLModel(model_data=s3_sparkml_data, env={'SAGEMAKER_SPARKML_SCHEMA' : schema_json})
   sparkml_model = SparkMLModel(model_data=s3_sparkml_data,  role=role, sagemaker_session = sagemaker.session.Session(sess), env={'SAGEMAKER_SPARKML_SCHEMA' : schema_json})
-  xgb_model = Model(model_data=s3_uri_model_location, role=role, sagemaker_session = sagemaker.session.Session(sess), image=training_image) 
+  xgb_model = Model(model_data=s3_uri_model_location, role=role, sagemaker_session = sagemaker.session.Session(sess), image=xgb_container) 
   pipline_model_name = 'inference-pipeline-' + timestamp_prefix
   sm_model = PipelineModel(name=pipline_model_name, 
       role=role, 
