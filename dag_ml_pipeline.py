@@ -159,10 +159,21 @@ train_model_task = SageMakerTrainingOperator(
     check_interval=30
 )
 
+# Inference pipeline endpoint task
+inference_pipeline_task = PythonOperator(
+    task_id='inference_pipeline',
+    dag=dag,
+    provide_context=True,
+    python_callable=inference_pipeline_ep,
+    op_kwargs={'role': role, 'sess': sess, 'xbg_model_uri': train_model_task['Training'], 'spark_model_uri': config['inference_pipeline']['inputs']['spark_model']}
+)
+
+# Cleanup task
 cleanup_task = DummyOperator(
     task_id='cleaning_up',
     dag=dag)
 
 init.set_downstream(sm_proc_job_task)
 sm_proc_job_task.set_downstream(train_model_task)
-train_model_task.set_downstream(cleanup_task)
+train_model_task.set_downstream(inference_pipeline_task)
+inference_pipeline_task.set_downstream(cleanup_task)

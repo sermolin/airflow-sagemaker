@@ -34,7 +34,6 @@ config["train_model"] = {
 
 config["inference_pipeline"] = {
     "inputs": {
-        "xgb_model": "s3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/model/xgboost/model.tar.gz",
         "spark_model": "s3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/model/spark/model.tar.gz"
     }
 }
