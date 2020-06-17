@@ -8,21 +8,6 @@ config["job_level"] = {
     "run_hyperparameter_opt": "no"
 }
 
-config["preprocess_data"] = {
-    "s3_in_url": "s3://amazon-reviews-pds/tsv/amazon_reviews_us_Digital_Video_Download_v1_00.tsv.gz",
-    "s3_out_bucket": "airflow-sagemaker-jeprk",  # replace
-    "s3_out_prefix": "preprocess/",
-    "delimiter": "\t"
-}
-
-config["prepare_data"] = {
-    "s3_in_bucket": "airflow-sagemaker-jeprk",  # replace
-    "s3_in_prefix": "preprocess/",
-    "s3_out_bucket": "airflow-sagemaker-jeprk",  # replace
-    "s3_out_prefix": "prepare/",
-    "delimiter": "\t"
-}
-
 config["train_model"] = {
     "sagemaker_role": "AirflowSageMakerExecutionRole",
     "estimator_config": {
@@ -30,8 +15,7 @@ config["train_model"] = {
         "train_instance_type": "ml.m4.xlarge",
         "train_volume_size": 20,
         "train_max_run": 3600,
-        # "output_path": "s3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/xgboost_model/",  # replace
-        "output_path": "s3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/xgboost_model",
+        "output_path": "s3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/model/xgboost", #replace
         "base_job_name": "c1-xgb-airflow",
         "hyperparameters": {
             "objective": "reg:linear",
@@ -44,26 +28,15 @@ config["train_model"] = {
         }
     },
     "inputs": {
-        "train": "s3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/2020-06-05-00-56-24/input/preprocessed/abalone/train/part-00000",
-        "validation": "s3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/2020-06-05-00-56-24/input/preprocessed/abalone/validation/part-00000"  # replace
+        "train": "s3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/input/preprocessed/abalone/train/part-00000",
+        "validation": "s3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/input/preprocessed/abalone/validation/part-00000"  # replace
     }
 }
 
-config["tune_model"] = {
-    "tuner_config": {
-        "objective_metric_name": "test:rmse",
-        "objective_type": "Minimize",
-        "hyperparameter_ranges": {
-            "factors_lr": ContinuousParameter(0.0001, 0.2),
-            "factors_init_sigma": ContinuousParameter(0.0001, 1)
-        },
-        "max_jobs": 20,
-        "max_parallel_jobs": 2,
-        "base_tuning_job_name": "hpo-recommender"
-    },
+config["inference_pipeline"] = {
     "inputs": {
-        "train": "s3://airflow-sagemaker-jeprk/prepare/train/train.protobuf",  # replace
-        "test": "s3://airflow-sagemaker-jeprk/prepare/validate/validate.protobuf"  # replace
+        "xgb_model": "s3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/model/xgboost/model.tar.gz",
+        "spark_model": "s3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/model/spark/model.tar.gz"
     }
 }
 

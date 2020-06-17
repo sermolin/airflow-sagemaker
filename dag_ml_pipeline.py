@@ -91,17 +91,32 @@ role = get_sagemaker_role_arn(
     sess.region_name)
 hpo_enabled = is_hpo_enabled()
 
+# create XGB estimator
+xgb_container = get_image_uri(sess.region_name, 'xgboost', repo_version="0.90-1")
+
+xgb_estimator = Estimator(
+    image_name=xgb_container,
+    role=role,
+    sagemaker_session=sagemaker.session.Session(sess),
+    **config["train_model"]["estimator_config"]
+)
+
+# train_config specifies SageMaker training configuration
+train_config = training_config(
+    estimator=xgb_estimator,
+    inputs={'train': config['train_model']['inputs']['train'], 'validation': config['train_model']['inputs']['validation']})
+
 # =============================================================================
 # define airflow DAG and tasks
 # =============================================================================
 # define airflow DAG
 args = {
     'owner': 'airflow',
-    'start_date': airflow.utils.dates.days_ago(1)
+    'start_date': airflow.utils.dates.days_ago(2)
 }
 
 dag = DAG(
-    'ml-pipeline-proc-hello',
+    'ml-pipeline',
     default_args=args,
     schedule_interval=None,
     concurrency=1,
@@ -109,14 +124,15 @@ dag = DAG(
     user_defined_filters={'tojson': lambda s: json.JSONEncoder().encode(s)}
 )
 
-# set the tasks in the DAG
+# Set the tasks in the DAG
 
-# dummy operator
+# Dummy start operator
 init = DummyOperator(
     task_id='start',
     dag=dag
 )
 
+# SageMaker processing job task
 sm_proc_job_task = PythonOperator(
     task_id='sm_proc_job',
     dag=dag,
@@ -124,6 +140,15 @@ sm_proc_job_task = PythonOperator(
     python_callable=sm_proc_job,
     op_kwargs={'role': role, 'sess': sess})
 
+# Train xgboost model task
+train_model_task = SageMakerTrainingOperator(
+    task_id='xgboost_model_training',
+    dag=dag,
+    config=train_config,
+    aws_conn_id='airflow-sagemaker',
+    wait_for_completion=True,
+    check_interval=30
+)
 
 # create_endpoint_task = PythonOperator(
 #     task_id='create_endpoint',
@@ -137,4 +162,5 @@ cleanup_task = DummyOperator(
     dag=dag)
 
 init.set_downstream(sm_proc_job_task)
-sm_proc_job_task.set_downstream(cleanup_task)
+sm_proc_job_task.set_downstream(train_model_task)
+train_model_task.set_downstream(cleanup_task)
