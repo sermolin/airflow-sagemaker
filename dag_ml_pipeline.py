@@ -175,4 +175,4 @@ cleanup_task = DummyOperator(
 # train_model_task.set_downstream(cleanup_task)
 
 init.set_downstream(train_model_task)
-train_model_task,set_downstream(cleanup_task)
+train_model_task.set_downstream(cleanup_task)
