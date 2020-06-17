@@ -97,11 +97,11 @@ hpo_enabled = is_hpo_enabled()
 # define airflow DAG
 args = {
     'owner': 'airflow',
-    'start_date': airflow.utils.dates.days_ago(2)
+    'start_date': airflow.utils.dates.days_ago(1)
 }
 
 dag = DAG(
-    'sagemaker-ml-pipeline-proc',
+    'sagemaker-ml-pipeline-proc-5',
     default_args=args,
     schedule_interval=None,
     concurrency=1,
