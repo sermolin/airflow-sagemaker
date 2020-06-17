@@ -1,2 +1,2 @@
 zip -r dag.zip *
-\cp dag.zip ~/airflow/dags/sagemaker-ml-pipeline-proc-5/
+\cp dag.zip ~/airflow/dags/ml-pipeline/
