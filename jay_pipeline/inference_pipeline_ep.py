@@ -10,7 +10,7 @@ from sagemaker.amazon.amazon_estimator import get_image_uri
 
 def inference_pipeline_ep(role, sess, xgb_model_uri, spark_model_uri):
     s3_sparkml_data_uri = spark_model_uri
-    s3_xgboost_model_uri = xbg_model_uri
+    s3_xgboost_model_uri = 's3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/model/xgboost' + xgb_model_uri + '/output/model.tar.gz'
 
     xgb_container = get_image_uri(
         sess.region_name, 'xgboost', repo_version="0.90-1")
