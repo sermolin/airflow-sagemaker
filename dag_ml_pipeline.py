@@ -49,8 +49,8 @@ from sagemaker.workflow.airflow import deploy_config
 from jay_pipeline.sm_proc_job import sm_proc_job
 from jay_pipeline.inference_pipeline_ep import inference_pipeline_ep
 
-import config as cfg
-import schema_utils
+import jay_pipeline.config as cfg
+import jay_pipeline.schema_utils
 
 # =============================================================================
 # functions
