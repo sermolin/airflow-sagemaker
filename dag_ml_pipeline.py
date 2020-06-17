@@ -170,6 +170,9 @@ cleanup_task = DummyOperator(
     task_id='cleaning_up',
     dag=dag)
 
-init.set_downstream(sm_proc_job_task)
-sm_proc_job_task.set_downstream(train_model_task)
-train_model_task.set_downstream(cleanup_task)
+# init.set_downstream(sm_proc_job_task)
+# sm_proc_job_task.set_downstream(train_model_task)
+# train_model_task.set_downstream(cleanup_task)
+
+init.set_downstream(train_model_task)
+train_model_task,set_downstream(cleanup_task)
