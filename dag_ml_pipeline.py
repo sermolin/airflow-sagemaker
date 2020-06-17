@@ -159,20 +159,10 @@ train_model_task = SageMakerTrainingOperator(
     check_interval=30
 )
 
-# create_endpoint_task = PythonOperator(
-#     task_id='create_endpoint',
-#     dag=dag,
-#     provide_context=False,
-#     python_callable=inference_pipeline_ep.inference_pipeline_ep,
-#     op_kwargs={'role': role, 'sess': sess})
-
 cleanup_task = DummyOperator(
     task_id='cleaning_up',
     dag=dag)
 
-# init.set_downstream(sm_proc_job_task)
-# sm_proc_job_task.set_downstream(train_model_task)
-# train_model_task.set_downstream(cleanup_task)
-
-init.set_downstream(train_model_task)
+init.set_downstream(sm_proc_job_task)
+sm_proc_job_task.set_downstream(train_model_task)
 train_model_task.set_downstream(cleanup_task)

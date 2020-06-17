@@ -19,14 +19,18 @@ def inference_pipeline_ep(role, sess, xgb_model_uri, spark_model_uri):
 
     sparkml_model = SparkMLModel(model_data=s3_sparkml_data_uri,  role=role, sagemaker_session=sagemaker.session.Session(
         sess), env={'SAGEMAKER_SPARKML_SCHEMA': schema_json})
+
     xgb_model = Model(model_data=s3_xgboost_model_uri, role=role,
                       sagemaker_session=sagemaker.session.Session(sess), image=xgb_container)
+
     pipeline_model_name = 'inference-pipeline-spark-xgboost'
+
     sm_model = PipelineModel(name=pipeline_model_name,
                              role=role,
                              sagemaker_session=sagemaker.session.Session(sess),
                              models=[sparkml_model, xgb_model])
 
     endpoint_name = 'inference-pipeline-endpoint'
+    
     sm_model.deploy(initial_instance_count=1,
                     instance_type='ml.c4.xlarge', endpoint_name=endpoint_name)
