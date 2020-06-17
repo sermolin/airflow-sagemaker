@@ -1,5 +1,6 @@
 # sm_proc_job.py
 import sagemaker
+from sagemaker.processing import ScriptProcessor, ProcessingInput
 from time import gmtime, strftime
 import boto3
 import os
@@ -16,8 +17,6 @@ def sm_proc_job(role, sess, **context):
     input_prefix = 'sagemaker/spark-preprocess-demo/input/raw/abalone'
     input_preprocessed_prefix = prefix + '/input/preprocessed/abalone'
     model_prefix = prefix + '/model'
-
-    from sagemaker.processing import ScriptProcessor, ProcessingInput
 
     spark_repository_uri = '885332847160.dkr.ecr.us-west-2.amazonaws.com/sagemaker-spark:latest'
 
