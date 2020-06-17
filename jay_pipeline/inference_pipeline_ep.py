@@ -37,8 +37,8 @@ def inference_pipeline_ep(role, sess):
         sess), env={'SAGEMAKER_SPARKML_SCHEMA': schema_json})
     xgb_model = Model(model_data=s3_uri_model_location, role=role,
                       sagemaker_session=sagemaker.session.Session(sess), image=xgb_container)
-    pipline_model_name = 'inference-pipeline-' + timestamp_prefix
-    sm_model = PipelineModel(name=pipline_model_name,
+    pipeline_model_name = 'inference-pipeline-' + timestamp_prefix
+    sm_model = PipelineModel(name=pipeline_model_name,
                              role=role,
                              sagemaker_session=sagemaker.session.Session(sess),
                              models=[sparkml_model, xgb_model])
