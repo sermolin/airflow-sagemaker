@@ -4,7 +4,7 @@ from sagemaker.tuner import ContinuousParameter
 config = {}
 
 config["job_level"] = {
-    "region_name": "us-east-1",
+    "region_name": "us-west-2",
     "run_hyperparameter_opt": "no"
 }
 
