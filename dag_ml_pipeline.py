@@ -165,7 +165,7 @@ inference_pipeline_task = PythonOperator(
     dag=dag,
     provide_context=True,
     python_callable=inference_pipeline_ep,
-    op_kwargs={'role': role, 'sess': sess, 'xbg_model_uri': train_model_task['Training'], 'spark_model_uri': config['inference_pipeline']['inputs']['spark_model']}
+    op_kwargs={'role': role, 'sess': sess, 'spark_model_uri': config['inference_pipeline']['inputs']['spark_model']}
 )
 
 # Cleanup task
