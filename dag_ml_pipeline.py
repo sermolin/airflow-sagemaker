@@ -120,8 +120,8 @@ init = DummyOperator(
 sm_proc_job_task = PythonOperator(
     task_id='sm_proc_job',
     dag=dag,
-    provide_context=False,
-    python_callable=sm_proc_job.sm_proc_job,
+    provide_context=True,
+    python_callable=sm_proc_job,
     op_kwargs={'role': role, 'sess': sess})
 
 
