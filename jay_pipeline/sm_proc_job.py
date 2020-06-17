@@ -18,7 +18,7 @@ def sm_proc_job(role, sess, **context):
     input_preprocessed_prefix = prefix + '/input/preprocessed/abalone'
     model_prefix = prefix + '/model'
 
-    spark_repository_uri = '885332847160.dkr.ecr.us-west-2.amazonaws.com/sagemaker-spark:latest'
+    spark_repository_uri = '885332847160.dkr.ecr.us-west-2.amazonaws.com/sagemaker-spark'
 
     # Create ECR repository and push docker image
     spark_processor = ScriptProcessor(base_job_name='spark-preprocessor',
@@ -33,7 +33,7 @@ def sm_proc_job(role, sess, **context):
                                       env={'mode': 'python'})
 
     spark_processor.run(code='s3://airflow-sagemaker-jeprk/code/smprocpreprocess.py', arguments=['s3_input_bucket', bucket, 's3_input_key_prefix', input_prefix,
-                                                                                                 's3_output_bucket', bucket, 's3_output_key_prefix', input_preprocessed_prefix, 's3_model_bucket', bucket, 's3_model_prefix', model_prefix], logs=False)
+                                                                                                 's3_output_bucket', bucket, 's3_output_key_prefix', input_preprocessed_prefix, 's3_model_bucket', bucket, 's3_model_prefix', model_prefix], logs=True)
     s3_training_path = 's3://' + bucket + \
         input_preprocessed_prefix + '/train/part-00000'
     s3_validation_path = 's3://' + bucket + \
