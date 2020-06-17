@@ -50,8 +50,7 @@ from sagemaker.workflow.airflow import deploy_config
 #from pipeline import prepare, preprocess
 #from pipeline import sm_proc_job, sm_proc_preprocess
 #
-from pipeline import sm_proc_job
-import inference_pipeline_ep
+from pipeline import sm_proc_jobm, inference_pipeline_ep
 #
 
 import config as cfg
@@ -132,7 +131,7 @@ train_config = training_config(
     estimator=xgb_estimator,
     inputs=data_channels)
 
-model_name = 'xgb-model-abalone-spark-1'
+model_name = 'xgb-model-abalone-spark-3'
 schema_json = schema_utils.abalone_schema()
 
 # MODEL COMPILATION
