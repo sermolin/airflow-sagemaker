@@ -113,7 +113,7 @@ data_channels = create_def_input_data_channels(config['train_model']['inputs']['
 
 train_config = training_config(
     estimator=xgb_estimator,
-    inputs={data_channels})
+    inputs=data_channels)
 
 # =============================================================================
 # define airflow DAG and tasks
