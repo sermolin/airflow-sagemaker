@@ -125,7 +125,7 @@ args = {
 }
 
 dag = DAG(
-    'ml-pipeline',
+    'ml-pipeline-test',
     default_args=args,
     schedule_interval=None,
     concurrency=1,
