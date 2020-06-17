@@ -101,7 +101,7 @@ args = {
 }
 
 dag = DAG(
-    'ml-pipeline-proc-1',
+    'ml-pipeline-proc-hello',
     default_args=args,
     schedule_interval=None,
     concurrency=1,
