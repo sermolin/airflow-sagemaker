@@ -89,6 +89,7 @@ sess = hook.get_session(region_name=region)
 role = get_sagemaker_role_arn(
     config["train_model"]["sagemaker_role"],
     sess.region_name)
+hpo_enabled = is_hpo_enabled()
 
 # =============================================================================
 # define airflow DAG and tasks
