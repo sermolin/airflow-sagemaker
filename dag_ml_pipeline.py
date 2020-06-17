@@ -74,6 +74,13 @@ def get_sagemaker_role_arn(role_name, region_name):
     response = iam.get_role(RoleName=role_name)
     return response["Role"]["Arn"]
 
+def create_def_input_data_channels(s3_train_data, s3_validation_data):    
+    train_data = sagemaker.session.s3_input(s3_train_data, distribution='FullyReplicated', 
+                        content_type='text/csv', s3_data_type='S3Prefix')
+    validation_data = sagemaker.session.s3_input(s3_validation_data, distribution='FullyReplicated', 
+                             content_type='text/csv', s3_data_type='S3Prefix')
+    return {'train': train_data, 'validation': validation_data}
+
 # =============================================================================
 # setting up training, tuning and transform configuration
 # =============================================================================
@@ -102,9 +109,11 @@ xgb_estimator = Estimator(
 )
 
 # train_config specifies SageMaker training configuration
+data_channels = create_def_input_data_channels(config['train_model']['inputs']['train'],config['train_model']['inputs']['validation'])
+
 train_config = training_config(
     estimator=xgb_estimator,
-    inputs={'train': config['train_model']['inputs']['train'], 'validation': config['train_model']['inputs']['validation']})
+    inputs={data_channels})
 
 # =============================================================================
 # define airflow DAG and tasks
