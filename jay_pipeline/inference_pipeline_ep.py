@@ -8,7 +8,7 @@ import os
 import sys
 from sagemaker.amazon.amazon_estimator import get_image_uri
 
-sm = boto3.client('sagemaker')
+sm = boto3.client('sagemaker', region='us-west-2')
 
 def inference_pipeline_ep(role, sess, spark_model_uri):
     s3_sparkml_data_uri = spark_model_uri
