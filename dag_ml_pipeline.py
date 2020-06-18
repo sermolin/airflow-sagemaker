@@ -80,6 +80,10 @@ def create_def_input_data_channels(s3_train_data, s3_validation_data):
                              content_type='text/csv', s3_data_type='S3Prefix')
     return {'train': train_data, 'validation': validation_data}
 
+def create_s3_input(s3_data):
+    data = sagemaker.session.s3_input(s3_data, distribution='FullyReplicated',  content_type='text/csv', s3_data_type='S3Prefix')
+    return data
+
 # =============================================================================
 # setting up training, tuning and transform configuration
 # =============================================================================
@@ -108,11 +112,34 @@ xgb_estimator = Estimator(
 )
 
 # train_config specifies SageMaker training configuration
-data_channels = create_def_input_data_channels(config['train_model']['inputs']['train'],config['train_model']['inputs']['validation'])
+
+train_data = create_s3_input(config['train_model']['inputs']['validation'])
+validation_data = create_s3_input(config['train_model']['inputs']['train'])
+data_channels = {'train': train_data, 'validation': validation_data}
 
 train_config = training_config(
     estimator=xgb_estimator,
     inputs=data_channels)
+
+# Batch inference
+model_name = 'xgb-model-abalone-spark-batch'
+test_data = create_s3_input(config['batch_transform']['inputs'])
+
+xgb_transformer = Transformer(
+    model_name = model_name,
+    instance_count = 1,
+    instance_type = 'ml.c5.xlarge',
+    sagemaker_session = sagemaker.session.Session(sess)
+    )
+
+transform_config = transform_config (
+    transformer = xgb_transformer,
+    job_name = 'xgb-tranform-job',
+    data = test_data,
+    content_type='text/csv',
+    split_type='Line',
+    data_type = 'S3Prefix'
+    )
 
 # =============================================================================
 # define airflow DAG and tasks
@@ -166,6 +193,15 @@ inference_pipeline_task = PythonOperator(
     op_kwargs={'role': role, 'sess': sess, 'spark_model_uri': config['inference_pipeline']['inputs']['spark_model']}
 )
 
+#launch sagemaker batch transform job and wait until it completes
+batch_transform_task = SageMakerTransformOperator(
+   task_id='batch_predicting',
+   dag=dag,
+   config=transform_config,
+   aws_conn_id='airflow-sagemaker',
+   wait_for_completion=True,
+   check_interval=30)
+
 # Cleanup task
 cleanup_task = DummyOperator(
     task_id='cleaning_up',
@@ -174,5 +210,7 @@ cleanup_task = DummyOperator(
 init.set_downstream(sm_proc_job_task)
 sm_proc_job_task.set_downstream(train_model_task)
 train_model_task.set_downstream(inference_pipeline_task)
+train_model_task.set_downstream(batch_transform_task)
 inference_pipeline_task.set_downstream(cleanup_task)
+batch_transform_task.set_downstream(cleanup_task)
 

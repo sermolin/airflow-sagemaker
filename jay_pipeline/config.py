@@ -47,5 +47,6 @@ config["batch_transform"] = {
         "content_type": "application/x-recordio-protobuf",
         "strategy": "MultiRecord",
         "output_path": "s3://airflow-sagemaker-jeprk/transform/"
-    }
+    },
+    "inputs": "s3://airflow-sagemaker-jeprk/sagemaker/spark-process-demo/batch_input/batch_input_abalone.csv"
 }
