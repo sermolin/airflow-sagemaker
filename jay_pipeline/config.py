@@ -15,7 +15,7 @@ config["train_model"] = {
         "train_volume_size": 20,
         "train_max_run": 3600,
         "output_path": "s3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/model/xgboost", #replace
-        "base_job_name": "xgboost-training-airflow",
+        "base_job_name": "xgb-training-airflow",
         "hyperparameters": {
             "objective": "reg:linear",
             "eta": ".2",
