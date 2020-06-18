@@ -201,7 +201,6 @@ cleanup_task = DummyOperator(
 init.set_downstream(sm_proc_job_task)
 sm_proc_job_task.set_downstream(train_model_task)
 train_model_task.set_downstream(inference_pipeline_task)
-train_model_task.set_downstream(batch_transform_task)
-inference_pipeline_task.set_downstream(cleanup_task)
+inference_pipeline_task.set_downstream(batch_transform_task)
 batch_transform_task.set_downstream(cleanup_task)
 
