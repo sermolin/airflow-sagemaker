@@ -46,11 +46,11 @@ from sagemaker.workflow.airflow import deploy_config
 
 # ml workflow specific
 
-from jay_pipeline.sm_proc_job import sm_proc_job
-from jay_pipeline.inference_pipeline_ep import inference_pipeline_ep
+from pipeline.sm_proc_job import sm_proc_job
+from pipeline.inference_pipeline_ep import inference_pipeline_ep
 
-import jay_pipeline.config as cfg
-import jay_pipeline.schema_utils
+import pipeline.config as cfg
+import pipeline.schema_utils
 
 # =============================================================================
 # functions
@@ -68,13 +68,16 @@ def is_hpo_enabled():
             hpo_enabled = True
     return hpo_enabled
 
+
 def get_sagemaker_role_arn(role_name, region_name):
     iam = boto3.client('iam', region_name=region_name)
     response = iam.get_role(RoleName=role_name)
     return response["Role"]["Arn"]
 
+
 def create_s3_input(s3_data):
-    data = sagemaker.session.s3_input(s3_data, distribution='FullyReplicated',  content_type='text/csv', s3_data_type='S3Prefix')
+    data = sagemaker.session.s3_input(
+        s3_data, distribution='FullyReplicated',  content_type='text/csv', s3_data_type='S3Prefix')
     return data
 
 # =============================================================================
@@ -95,7 +98,8 @@ role = get_sagemaker_role_arn(
 hpo_enabled = is_hpo_enabled()
 
 # create XGB estimator
-xgb_container = get_image_uri(sess.region_name, 'xgboost', repo_version="0.90-1")
+xgb_container = get_image_uri(
+    sess.region_name, 'xgboost', repo_version="0.90-1")
 
 xgb_estimator = Estimator(
     image_name=xgb_container,
@@ -117,20 +121,20 @@ train_config = training_config(
 # Batch inference
 
 xgb_transformer = Transformer(
-    model_name = config['batch_transform']['model_name'],
-    instance_count = 1,
-    instance_type = 'ml.c5.xlarge',
-    sagemaker_session = sagemaker.session.Session(sess)
-    )
+    model_name=config['batch_transform']['model_name'],
+    instance_count=1,
+    instance_type='ml.c5.xlarge',
+    sagemaker_session=sagemaker.session.Session(sess)
+)
 
-transform_config = transform_config (
-    transformer = xgb_transformer,
-    job_name = 'xgb-tranform-job',
-    data = config['batch_transform']['inputs'],
+transform_config = transform_config(
+    transformer=xgb_transformer,
+    job_name='xgb-tranform-job',
+    data=config['batch_transform']['inputs'],
     content_type='text/csv',
     split_type='Line',
-    data_type = 'S3Prefix'
-    )
+    data_type='S3Prefix'
+)
 
 # =============================================================================
 # define airflow DAG and tasks
@@ -181,17 +185,18 @@ inference_pipeline_task = PythonOperator(
     task_id='inference_pipeline',
     dag=dag,
     python_callable=inference_pipeline_ep,
-    op_kwargs={'role': role, 'sess': sess, 'spark_model_uri': config['inference_pipeline']['inputs']['spark_model']}
+    op_kwargs={'role': role, 'sess': sess,
+               'spark_model_uri': config['inference_pipeline']['inputs']['spark_model']}
 )
 
-#launch sagemaker batch transform job and wait until it completes
+# launch sagemaker batch transform job and wait until it completes
 batch_transform_task = SageMakerTransformOperator(
-   task_id='batch_predicting',
-   dag=dag,
-   config=transform_config,
-   aws_conn_id='airflow-sagemaker',
-   wait_for_completion=True,
-   check_interval=30)
+    task_id='batch_predicting',
+    dag=dag,
+    config=transform_config,
+    aws_conn_id='airflow-sagemaker',
+    wait_for_completion=True,
+    check_interval=30)
 
 # Cleanup task
 cleanup_task = DummyOperator(
@@ -203,4 +208,3 @@ sm_proc_job_task.set_downstream(train_model_task)
 train_model_task.set_downstream(inference_pipeline_task)
 inference_pipeline_task.set_downstream(batch_transform_task)
 batch_transform_task.set_downstream(cleanup_task)
-

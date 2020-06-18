@@ -6,6 +6,7 @@ import sys
 import os
 import shutil
 import csv
+import boto3
 
 import pyspark
 from pyspark.sql import SparkSession
@@ -13,6 +14,7 @@ from pyspark.ml import Pipeline
 from pyspark.sql.types import StructField, StructType, StringType, DoubleType
 from pyspark.ml.feature import StringIndexer, VectorIndexer, OneHotEncoder, VectorAssembler
 from pyspark.sql.functions import *
+from mleap.pyspark.spark_support import SimpleSparkSerializer
 
 
 def csv_line(data):
@@ -87,15 +89,25 @@ def main():
     validation_lines.saveAsTextFile(
         's3a://' + os.path.join(args['s3_output_bucket'], args['s3_output_key_prefix'], 'validation'))
 
-    # Return the S3 paths for training and validation datasets
-    s3_training_path = 's3://' + \
-        os.path.join(args['s3_output_bucket'],
-                     args['s3_output_key_prefix'], 'train')
-    s3_validation_path = 's3://' + \
-        os.path.join(args['s3_output_bucket'],
-                     args['s3_output_key_prefix'], 'validation')
+    # Serialize and store the model via MLeap
+    SimpleSparkSerializer().serializeToBundle(
+        model, "jar:file:/opt/ml/model.zip", validation_df)
+    # Unzip the model as SageMaker expects a .tar.gz file but MLeap produces a .zip file
+    import zipfile
+    with zipfile.ZipFile("/opt/ml/model.zip") as zf:
+        zf.extractall("/opt/ml/model")
 
-    return s3_training_path, s3_validation_path
+    # Writw back the content as a .tar.gz file
+    import tarfile
+    with tarfile.open("/opt/ml/model.tar.gz", "w:gz") as tar:
+        tar.add("/opt/ml/model/bundle.json", arcname='bundle.json')
+        tar.add("/opt/ml/model/root", arcname='root')
+
+    # Upload the model in tar.gz format to S3 so that it can be used with SageMaker for inference later
+    s3 = boto3.resource('s3')
+    file_name = os.path.join(args['s3_model_prefix'], 'model.tar.gz')
+    s3.Bucket(args['s3_model_bucket']).upload_file(
+        '/opt/ml/model.tar.gz', file_name)
 
 
 if __name__ == "__main__":
