@@ -115,10 +115,9 @@ train_config = training_config(
     inputs=data_channels)
 
 # Batch inference
-batch_transform_name = 'xgb-model-abalone-spark-batch'
 
 xgb_transformer = Transformer(
-    model_name = batch_transform_name,
+    model_name = config['batch_transform']['model_name'],
     instance_count = 1,
     instance_type = 'ml.c5.xlarge',
     sagemaker_session = sagemaker.session.Session(sess)
