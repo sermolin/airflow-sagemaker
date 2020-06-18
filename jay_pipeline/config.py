@@ -48,5 +48,6 @@ config["batch_transform"] = {
         "strategy": "MultiRecord",
         "output_path": "s3://airflow-sagemaker-jeprk/transform/"
     },
-    "inputs": "s3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/batch_input/batch_input_abalone.csv"
+    "inputs": "s3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/batch_input/batch_input_abalone.csv",
+    "model_name": 'inference-pipeline-endpoint'
 }
