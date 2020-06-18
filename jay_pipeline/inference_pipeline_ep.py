@@ -6,6 +6,7 @@ from time import gmtime, strftime
 import boto3
 import os
 import sys
+import schema_utils
 from sagemaker.amazon.amazon_estimator import get_image_uri
 
 sm = boto3.client('sagemaker', region_name='us-west-2')
