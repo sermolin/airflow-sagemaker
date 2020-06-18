@@ -73,13 +73,6 @@ def get_sagemaker_role_arn(role_name, region_name):
     response = iam.get_role(RoleName=role_name)
     return response["Role"]["Arn"]
 
-def create_def_input_data_channels(s3_train_data, s3_validation_data):    
-    train_data = sagemaker.session.s3_input(s3_train_data, distribution='FullyReplicated', 
-                        content_type='text/csv', s3_data_type='S3Prefix')
-    validation_data = sagemaker.session.s3_input(s3_validation_data, distribution='FullyReplicated', 
-                             content_type='text/csv', s3_data_type='S3Prefix')
-    return {'train': train_data, 'validation': validation_data}
-
 def create_s3_input(s3_data):
     data = sagemaker.session.s3_input(s3_data, distribution='FullyReplicated',  content_type='text/csv', s3_data_type='S3Prefix')
     return data
@@ -122,11 +115,10 @@ train_config = training_config(
     inputs=data_channels)
 
 # Batch inference
-model_name = 'xgb-model-abalone-spark-batch'
-test_data = create_s3_input(config['batch_transform']['inputs'])
+batch_transform_name = 'xgb-model-abalone-spark-batch'
 
 xgb_transformer = Transformer(
-    model_name = model_name,
+    model_name = batch_transform_name,
     instance_count = 1,
     instance_type = 'ml.c5.xlarge',
     sagemaker_session = sagemaker.session.Session(sess)
@@ -135,7 +127,7 @@ xgb_transformer = Transformer(
 transform_config = transform_config (
     transformer = xgb_transformer,
     job_name = 'xgb-tranform-job',
-    data = test_data,
+    data = config['batch_transform']['inputs'],
     content_type='text/csv',
     split_type='Line',
     data_type = 'S3Prefix'
