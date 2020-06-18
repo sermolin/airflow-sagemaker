@@ -141,23 +141,23 @@ init = DummyOperator(
     dag=dag
 )
 
-# SageMaker processing job task
-sm_proc_job_task = PythonOperator(
-    task_id='sm_proc_job',
-    dag=dag,
-    provide_context=True,
-    python_callable=sm_proc_job,
-    op_kwargs={'role': role, 'sess': sess})
+# # SageMaker processing job task
+# sm_proc_job_task = PythonOperator(
+#     task_id='sm_proc_job',
+#     dag=dag,
+#     provide_context=True,
+#     python_callable=sm_proc_job,
+#     op_kwargs={'role': role, 'sess': sess})
 
-# Train xgboost model task
-train_model_task = SageMakerTrainingOperator(
-    task_id='xgboost_model_training',
-    dag=dag,
-    config=train_config,
-    aws_conn_id='airflow-sagemaker',
-    wait_for_completion=True,
-    check_interval=30
-)
+# # Train xgboost model task
+# train_model_task = SageMakerTrainingOperator(
+#     task_id='xgboost_model_training',
+#     dag=dag,
+#     config=train_config,
+#     aws_conn_id='airflow-sagemaker',
+#     wait_for_completion=True,
+#     check_interval=30
+# )
 
 # Inference pipeline endpoint task
 inference_pipeline_task = PythonOperator(
@@ -173,7 +173,10 @@ cleanup_task = DummyOperator(
     task_id='cleaning_up',
     dag=dag)
 
-init.set_downstream(sm_proc_job_task)
-sm_proc_job_task.set_downstream(train_model_task)
-train_model_task.set_downstream(inference_pipeline_task)
+# init.set_downstream(sm_proc_job_task)
+# sm_proc_job_task.set_downstream(train_model_task)
+# train_model_task.set_downstream(inference_pipeline_task)
+# inference_pipeline_task.set_downstream(cleanup_task)
+
+init.set_downstream(inference_pipeline_task)
 inference_pipeline_task.set_downstream(cleanup_task)
