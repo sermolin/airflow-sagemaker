@@ -15,7 +15,7 @@ config["train_model"] = {
         "train_volume_size": 20,
         "train_max_run": 3600,
         "output_path": "s3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/model/xgboost", #replace
-        "base_job_name": "xgb-training-airflow",
+        "base_job_name": "xgboost-training-airflow",
         "hyperparameters": {
             "objective": "reg:linear",
             "eta": ".2",
@@ -48,5 +48,5 @@ config["batch_transform"] = {
         "strategy": "MultiRecord",
         "output_path": "s3://airflow-sagemaker-jeprk/transform/"
     },
-    "inputs": "s3://airflow-sagemaker-jeprk/sagemaker/spark-process-demo/batch_input/batch_input_abalone.csv"
+    "inputs": "s3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/batch_input/batch_input_abalone.csv"
 }
