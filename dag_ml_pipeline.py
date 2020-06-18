@@ -142,7 +142,7 @@ args = {
 }
 
 dag = DAG(
-    'ml-pipeline-final',
+    'ml-pipeline-cof',
     default_args=args,
     schedule_interval=None,
     concurrency=1,
