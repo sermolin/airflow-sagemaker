@@ -163,7 +163,6 @@ init = DummyOperator(
 inference_pipeline_task = PythonOperator(
     task_id='inference_pipeline',
     dag=dag,
-    provide_context=True,
     python_callable=inference_pipeline_ep,
     op_kwargs={'role': role, 'sess': sess, 'spark_model_uri': config['inference_pipeline']['inputs']['spark_model']}
 )
