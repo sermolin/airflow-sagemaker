@@ -25,7 +25,7 @@ def csv_line(data):
 
 def main():
     spark = SparkSession.builder.appName("PySparkAbalone").getOrCreate()
-    s3 = boto3.client('s3')
+    s3 = boto3.resource('s3')
     # Convert command line args into a map of args
     args_iter = iter(sys.argv[1:])
     args = dict(zip(args_iter, args_iter))
