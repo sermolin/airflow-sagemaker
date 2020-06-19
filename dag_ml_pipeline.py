@@ -42,7 +42,6 @@ from sagemaker.workflow.airflow import transform_config
 from sagemaker.workflow.airflow import deploy_config
 
 # ml workflow specific
-from time import gmtime, strftime
 from pipeline import inference_pipeline_ep, sm_proc_job
 import config as cfg
 
@@ -90,9 +89,6 @@ role = get_sagemaker_role_arn(
     config["train_model"]["sagemaker_role"],
     sess.region_name)
 
-# Create timestamp
-timestamp_prefix = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
-
 # create XGB estimator
 xgb_container = get_image_uri(
     sess.region_name, 'xgboost', repo_version="0.90-1")
@@ -107,9 +103,9 @@ xgb_estimator = Estimator(
 # train_config specifies SageMaker training configuration
 
 train_data = create_s3_input(
-    config['train_model']['inputs']['train'].replace('time', timestamp_prefix, 1))
+    config['train_model']['inputs']['train'])
 validation_data = create_s3_input(
-    config['train_model']['inputs']['validation'].replace('time', timestamp_prefix, 1))
+    config['train_model']['inputs']['validation'])
 data_channels = {'train': train_data, 'validation': validation_data}
 
 train_config = training_config(
@@ -166,7 +162,7 @@ sm_proc_job_task = PythonOperator(
     dag=dag,
     provide_context=True,
     python_callable=sm_proc_job.sm_proc_job,
-    op_kwargs={'role': role, 'sess': sess, 'timestamp': timestamp_prefix, 'bucket': config['bucket']})
+    op_kwargs={'role': role, 'sess': sess, 'bucket': config['bucket']})
 
 # Train xgboost model task
 train_model_task = SageMakerTrainingOperator(
@@ -184,7 +180,7 @@ inference_pipeline_task = PythonOperator(
     dag=dag,
     python_callable=inference_pipeline_ep.inference_pipeline_ep,
     op_kwargs={'role': role, 'sess': sess,
-               'spark_model_uri': config['inference_pipeline']['inputs']['spark_model'].replace('time', timestamp_prefix, 1), 'bucket': config['bucket']}
+               'spark_model_uri': config['inference_pipeline']['inputs']['spark_model'], 'bucket': config['bucket']}
 )
 
 # launch sagemaker batch transform job and wait until it completes

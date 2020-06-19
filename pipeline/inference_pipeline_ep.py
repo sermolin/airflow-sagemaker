@@ -7,11 +7,14 @@ import os
 import sys
 import schema_utils
 from sagemaker.amazon.amazon_estimator import get_image_uri
+from time import gmtime, strftime
 
 sm = boto3.client('sagemaker', region_name='us-east-1')
 
 
 def inference_pipeline_ep(role, sess, spark_model_uri, timestamp, bucket, ** context):
+    timestamp_prefix = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+
     s3_sparkml_data_uri = spark_model_uri
     s3_xgboost_model = sm.list_training_jobs(MaxResults=1, StatusEquals='Completed', SortBy='CreationTime',
                                              NameContains='training-job-', SortOrder='Descending')['TrainingJobSummaries'][0]['TrainingJobName']
@@ -30,7 +33,7 @@ def inference_pipeline_ep(role, sess, spark_model_uri, timestamp, bucket, ** con
     xgb_model = Model(model_data=s3_xgboost_model_uri, role=role,
                       sagemaker_session=sagemaker.session.Session(sess), image=xgb_container)
 
-    pipeline_model_name = 'inference-pipeline-spark-xgboost-' + timestamp
+    pipeline_model_name = 'inference-pipeline-spark-xgboost'
 
     sm_model = PipelineModel(name=pipeline_model_name,
                              role=role,

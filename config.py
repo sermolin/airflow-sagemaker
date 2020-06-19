@@ -1,4 +1,3 @@
-timestamp_prefix = 'time'
 bucket = 'airflow-sm-jeprk'
 
 config = {}
@@ -30,14 +29,14 @@ config["train_model"] = {
         }
     },
     "inputs": {
-        "train": "s3://"+bucket+"/sagemaker/spark-preprocess/inputs/preprocessed/abalone/"+timestamp_prefix+"/train/part-00000",
-        "validation": "s3://"+bucket+"/sagemaker/spark-preprocess/inputs/preprocessed/abalone/"+timestamp_prefix+"/validation/part-00000"  # replace
+        "train": "s3://"+bucket+"/sagemaker/spark-preprocess/inputs/preprocessed/abalone/train/part-00000",
+        "validation": "s3://"+bucket+"/sagemaker/spark-preprocess/inputs/preprocessed/abalone/validation/part-00000"  # replace
     }
 }
 
 config["inference_pipeline"] = {
     "inputs": {
-        "spark_model": "s3://"+bucket+"/sagemaker/spark-preprocess/model/spark/"+timestamp_prefix+"/model.tar.gz"
+        "spark_model": "s3://"+bucket+"/sagemaker/spark-preprocess/model/spark/model.tar.gz"
     }
 }
 
@@ -53,5 +52,5 @@ config["batch_transform"] = {
     },
     "inputs": "s3://"+bucket+"/sagemaker/spark-preprocess/inputs/raw/abalone/abalone.csv",
     "input_filter": "$[1:]",
-    "model_name": "inference-pipeline-spark-xgboost"+timestamp_prefix
+    "model_name": "inference-pipeline-spark-xgboost"
 }
