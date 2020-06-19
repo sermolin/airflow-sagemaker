@@ -5,16 +5,15 @@ import boto3
 import os
 import sys
 
-def sm_proc_job(role, sess, timestamp, **context):
 
-    bucket = "airflow-sagemaker-jeprk"
+def sm_proc_job(role, sess, timestamp, bucket, **context):
 
     prefix = "sagemaker/spark-preprocess-demo/"
     input_prefix = prefix + "input/raw/abalone"
     input_preprocessed_prefix = prefix + "/input/preprocessed/"+timestamp+"/abalone"
     model_prefix = prefix + "model/spark/"+timestamp
 
-    spark_repository_uri = "885332847160.dkr.ecr.us-west-2.amazonaws.com/sagemaker-spark"
+    spark_repository_uri = "154727479023.dkr.ecr.us-east-1.amazonaws.com/sagemaker-spark-example"
 
     spark_processor = ScriptProcessor(base_job_name="spark-preprocessor",
                                       image_uri=spark_repository_uri,
