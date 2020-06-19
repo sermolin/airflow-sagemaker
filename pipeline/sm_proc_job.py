@@ -1,7 +1,5 @@
 # sm_proc_job.py
-import sagemaker
 from sagemaker.processing import ScriptProcessor, ProcessingInput
-from time import gmtime, strftime
 import boto3
 import os
 import sys
