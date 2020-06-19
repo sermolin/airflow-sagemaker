@@ -9,13 +9,13 @@ import sys
 import schema_utils
 from sagemaker.amazon.amazon_estimator import get_image_uri
 
-sm = boto3.client('sagemaker', region_name='us-west-2')
+sm = boto3.client('sagemaker', region_name='us-east-1')
 
 def inference_pipeline_ep(role, sess, spark_model_uri, **context):
     s3_sparkml_data_uri = spark_model_uri
     s3_xgboost_model = sm.list_training_jobs(MaxResults=1, StatusEquals='Completed', SortBy='CreationTime', NameContains='xgboost-training', SortOrder='Descending')['TrainingJobSummaries'][0]['TrainingJobName']
 
-    s3_xgboost_model_uri = 's3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/model/xgboost/' + s3_xgboost_model + '/output/model.tar.gz'
+    s3_xgboost_model_uri = 's3://airflow-sagemaker-2/sagemaker/spark-preprocess-demo/model/xgboost/' + s3_xgboost_model + '/output/model.tar.gz'
 
     xgb_container = get_image_uri(
         sess.region_name, 'xgboost', repo_version="0.90-1")

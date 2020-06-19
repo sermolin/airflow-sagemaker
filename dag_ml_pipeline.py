@@ -87,6 +87,7 @@ def create_s3_input(s3_data):
 
 # read config file
 config = cfg.config
+timestamp_prefix = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
 # set configuration for tasks
 hook = AwsHook(aws_conn_id='airflow-sagemaker')
@@ -129,7 +130,7 @@ xgb_transformer = Transformer(
 
 transform_config = transform_config(
     transformer=xgb_transformer,
-    job_name='xgb-tranform-job',
+    job_name='xgb-tranform-job-' + timestamp_prefix,
     data=config['batch_transform']['inputs'],
     content_type='text/csv',
     split_type='Line',
@@ -146,7 +147,7 @@ args = {
 }
 
 dag = DAG(
-    'ml-pipeline-cof',
+    'ml-pipeline-batch',
     default_args=args,
     schedule_interval=None,
     concurrency=1,
