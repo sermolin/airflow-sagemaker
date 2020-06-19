@@ -1,6 +1,8 @@
 from time import gmtime, strftime
 
-if timestamp_prefix not in locals():
+try:
+    timestamp_prefix
+except NameError:
     timestamp_prefix = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
 bucket = 'airflow-sm-jeprk'
