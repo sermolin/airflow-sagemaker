@@ -5,7 +5,7 @@ from datetime import datetime
 
 # airflow operators
 import airflow
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 
@@ -90,12 +90,10 @@ xgb_estimator = Estimator(
 
 # train_config specifies SageMaker training configuration
 
-timestamp = Variable.get("timestamp")
-
 train_data = create_s3_input(
-    config['train_model']['inputs']['train'].replace('time', timestamp, 1))
+    config['train_model']['inputs']['train'])
 validation_data = create_s3_input(
-    config['train_model']['inputs']['validation'].replace('time', timestamp, 1))
+    config['train_model']['inputs']['validation'])
 data_channels = {'train': train_data, 'validation': validation_data}
 
 train_config = training_config(

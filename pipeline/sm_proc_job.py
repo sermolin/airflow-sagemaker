@@ -17,7 +17,7 @@ def sm_proc_job(role, sess, bucket, **context):
     input_prefix = prefix + "inputs/raw/abalone"
     input_preprocessed_prefix = prefix + \
         "/inputs/preprocessed/abalone/" + timestamp_prefix
-    model_prefix = prefix + "model/spark/"
+    model_prefix = prefix + "model/spark/" + timestamp_prefix
 
     spark_repository_uri = "154727479023.dkr.ecr.us-east-1.amazonaws.com/sagemaker-spark-example"
 

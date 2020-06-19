@@ -1,6 +1,10 @@
+from airflow.models import Variable
+
 bucket = 'airflow-sm-jeprk'
 
 config = {}
+
+timestamp = Variable.get("timestamp")
 
 config["job_level"] = {
     "region_name": "us-east-1",
@@ -29,14 +33,14 @@ config["train_model"] = {
         }
     },
     "inputs": {
-        "train": "s3://"+bucket+"/sagemaker/spark-preprocess/inputs/preprocessed/abalone/time/train/part-00000",
-        "validation": "s3://"+bucket+"/sagemaker/spark-preprocess/inputs/preprocessed/abalone/time/validation/part-00000"  # replace
+        "train": "s3://"+bucket+"/sagemaker/spark-preprocess/inputs/preprocessed/abalone/"+timestamp+"/train/part-00000",
+        "validation": "s3://"+bucket+"/sagemaker/spark-preprocess/inputs/preprocessed/abalone/"+timestamp+"/validation/part-00000"  # replace
     }
 }
 
 config["inference_pipeline"] = {
     "inputs": {
-        "spark_model": "s3://"+bucket+"/sagemaker/spark-preprocess/model/spark/model.tar.gz"
+        "spark_model": "s3://"+bucket+"/sagemaker/spark-preprocess/model/spark/"+timestamp+"/model.tar.gz"
     }
 }
 
