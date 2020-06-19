@@ -11,7 +11,7 @@ config["job_level"] = {
     "run_hyperparameter_opt": "no"
 }
 
-config["timestamp"] = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+config["timestamp"] = timestamp_prefix
 
 config["bucket"] = bucket
 
