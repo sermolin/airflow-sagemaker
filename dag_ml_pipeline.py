@@ -44,7 +44,7 @@ from sagemaker.workflow.airflow import deploy_config
 
 from pipeline import sm_proc_job
 from pipeline import inference_pipeline_ep
-import config as cfg
+import pipeline.config as cfg
 
 
 # =============================================================================
