@@ -9,10 +9,10 @@ from airflow.models import Variable
 
 current_time = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 timestamp_prefix = current_time
-timestamp = Variable.set("timestamp", timestamp_prefix)
 
 
 def sm_proc_job(role, sess, bucket, **context):
+    timestamp = Variable.set("timestamp", timestamp_prefix)
 
     prefix = "sagemaker/spark-preprocess/"
     input_prefix = prefix + "inputs/raw/abalone"
