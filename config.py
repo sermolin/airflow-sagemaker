@@ -22,7 +22,7 @@ config["train_model"] = {
         "train_instance_type": "ml.m4.xlarge",
         "train_volume_size": 20,
         "train_max_run": 3600,
-        "output_path": "s3://"+bucket+"/sagemaker/spark-preprocess-demo/model/xgboost",
+        "output_path": "s3://"+bucket+"/sagemaker/spark-preprocess/model/xgboost",
         "base_job_name": "training-job-",
         "hyperparameters": {
             "objective": "reg:linear",
@@ -35,14 +35,14 @@ config["train_model"] = {
         }
     },
     "inputs": {
-        "train": "s3://"+bucket+"/sagemaker/spark-preprocess-demo/input/preprocessed/abalone/"+timestamp_prefix+"train/part-00000",
-        "validation": "s3://"+bucket+"/sagemaker/spark-preprocess-demo/input/preprocessed/"+timestamp_prefix+"/abalone/validation/part-00000"  # replace
+        "train": "s3://"+bucket+"/sagemaker/spark-preprocess/input/preprocessed/abalone/"+timestamp_prefix+"train/part-00000",
+        "validation": "s3://"+bucket+"/sagemaker/spark-preprocess/input/preprocessed/"+timestamp_prefix+"/abalone/validation/part-00000"  # replace
     }
 }
 
 config["inference_pipeline"] = {
     "inputs": {
-        "spark_model": "s3://"+bucket+"/sagemaker/spark-preprocess-demo/model/spark/"+timestamp_prefix+"model.tar.gz"
+        "spark_model": "s3://"+bucket+"/sagemaker/spark-preprocess/model/spark/"+timestamp_prefix+"model.tar.gz"
     }
 }
 
