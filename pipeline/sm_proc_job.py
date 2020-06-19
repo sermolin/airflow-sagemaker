@@ -7,7 +7,8 @@ import sys
 from time import gmtime, strftime
 from airflow.models import Variable
 
-timestamp_prefix = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+current_time = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+timestamp = current_time
 timestamp = Variable.set("timestamp", timestamp_prefix)
 
 
