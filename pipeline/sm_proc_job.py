@@ -5,8 +5,10 @@ import boto3
 import os
 import sys
 from time import gmtime, strftime
+from airflow.models import Variable
 
 timestamp_prefix = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+timestamp = Variable.set("timestamp", timestamp_prefix)
 
 
 def sm_proc_job(role, sess, bucket, **context):

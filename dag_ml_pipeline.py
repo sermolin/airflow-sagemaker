@@ -90,7 +90,7 @@ xgb_estimator = Estimator(
 
 # train_config specifies SageMaker training configuration
 
-timestamp = Variable.get("TIMESTAMP")
+timestamp = Variable.get("timestamp")
 
 train_data = create_s3_input(
     config['train_model']['inputs']['train'].replace('time', timestamp, 1))
