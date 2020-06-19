@@ -44,11 +44,8 @@ from sagemaker.workflow.airflow import deploy_config
 # ml workflow specific
 
 
-from pipeline import inference_pipeline_ep,sm_proc_job
+from pipeline import inference_pipeline_ep.py, sm_proc_job.py
 import pipeline.config as cfg
-
-
-
 
 # =============================================================================
 # functions
