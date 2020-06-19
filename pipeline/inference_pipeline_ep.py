@@ -2,7 +2,6 @@ import sagemaker
 from sagemaker.pipeline import PipelineModel
 from sagemaker.sparkml.model import SparkMLModel
 from sagemaker.model import Model
-from time import gmtime, strftime
 import boto3
 import os
 import sys
@@ -11,9 +10,9 @@ from sagemaker.amazon.amazon_estimator import get_image_uri
 
 sm = boto3.client('sagemaker', region_name='us-west-2')
 
-def inference_pipeline_ep(role, sess, spark_model_uri, **context):
+def inference_pipeline_ep(role, sess, spark_model_uri, timestamp, **context):
     s3_sparkml_data_uri = spark_model_uri
-    s3_xgboost_model = sm.list_training_jobs(MaxResults=1, StatusEquals='Completed', SortBy='CreationTime', NameContains='xgboost-training', SortOrder='Descending')['TrainingJobSummaries'][0]['TrainingJobName']
+    s3_xgboost_model = sm.list_training_jobs(MaxResults=1, StatusEquals='Completed', SortBy='CreationTime', NameContains='training-job-', SortOrder='Descending')['TrainingJobSummaries'][0]['TrainingJobName']
 
     s3_xgboost_model_uri = 's3://airflow-sagemaker-jeprk/sagemaker/spark-preprocess-demo/model/xgboost/' + s3_xgboost_model + '/output/model.tar.gz'
 
@@ -28,14 +27,14 @@ def inference_pipeline_ep(role, sess, spark_model_uri, **context):
     xgb_model = Model(model_data=s3_xgboost_model_uri, role=role,
                       sagemaker_session=sagemaker.session.Session(sess), image=xgb_container)
 
-    pipeline_model_name = 'inference-pipeline-spark-xgboost'
+    pipeline_model_name = 'inference-pipeline-spark-xgboost-' + timestamp
 
     sm_model = PipelineModel(name=pipeline_model_name,
                              role=role,
                              sagemaker_session=sagemaker.session.Session(sess),
                              models=[sparkml_model, xgb_model])
 
-    endpoint_name = 'inference-pipeline-endpoint'
+    endpoint_name = 'inference-pipeline-endpoint-' + timestamp
     
     sm_model.deploy(initial_instance_count=1,
                     instance_type='ml.c4.xlarge', endpoint_name=endpoint_name)

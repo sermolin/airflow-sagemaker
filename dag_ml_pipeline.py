@@ -1,14 +1,11 @@
 from __future__ import print_function
 import json
-import requests
 from datetime import datetime
 from time import gmtime, strftime
 
 # airflow operators
 import airflow
 from airflow.models import DAG
-from airflow.utils.trigger_rule import TriggerRule
-from airflow.operators.python_operator import BranchPythonOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 
@@ -95,7 +92,6 @@ sess = hook.get_session(region_name=region)
 role = get_sagemaker_role_arn(
     config["train_model"]["sagemaker_role"],
     sess.region_name)
-hpo_enabled = is_hpo_enabled()
 
 # create XGB estimator
 xgb_container = get_image_uri(
