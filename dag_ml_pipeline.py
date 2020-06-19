@@ -162,7 +162,7 @@ sm_proc_job_task = PythonOperator(
     dag=dag,
     provide_context=True,
     python_callable=sm_proc_job,
-    op_kwargs={'role': role, 'sess': sess})
+    op_kwargs={'role': role, 'sess': sess, 'timestamp': config['timestamp']})
 
 # Train xgboost model task
 train_model_task = SageMakerTrainingOperator(

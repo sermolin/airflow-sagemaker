@@ -10,6 +10,8 @@ config["job_level"] = {
     "run_hyperparameter_opt": "no"
 }
 
+config["timestamp"] = timestamp_prefix
+
 config["train_model"] = {
     "sagemaker_role": "AirflowSageMakerExecutionRole",
     "estimator_config": {
