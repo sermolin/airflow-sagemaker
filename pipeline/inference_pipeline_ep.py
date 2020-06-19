@@ -16,8 +16,8 @@ def inference_pipeline_ep(role, sess, spark_model_uri, timestamp, bucket, ** con
     s3_xgboost_model = sm.list_training_jobs(MaxResults=1, StatusEquals='Completed', SortBy='CreationTime',
                                              NameContains='training-job-', SortOrder='Descending')['TrainingJobSummaries'][0]['TrainingJobName']
 
-    s3_xgboost_model_uri = 's3://'+bucket+'/sagemaker/spark-preprocess/model/xgboost/' +
-    s3_xgboost_model + '/output/model.tar.gz'
+    s3_xgboost_model_uri = 's3://'+bucket+'/sagemaker/spark-preprocess/model/xgboost/' + \
+        s3_xgboost_model+'/output/model.tar.gz'
 
     xgb_container = get_image_uri(
         sess.region_name, 'xgboost', repo_version='0.90-1')
