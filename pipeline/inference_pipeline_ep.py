@@ -12,7 +12,7 @@ from time import gmtime, strftime
 sm = boto3.client('sagemaker', region_name='us-east-1')
 
 
-def inference_pipeline_ep(role, sess, spark_model_uri, timestamp, bucket, ** context):
+def inference_pipeline_ep(role, sess, spark_model_uri, bucket, ** context):
     timestamp_prefix = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
     s3_sparkml_data_uri = spark_model_uri
@@ -41,7 +41,7 @@ def inference_pipeline_ep(role, sess, spark_model_uri, timestamp, bucket, ** con
                                  sess),
                              models=[sparkml_model, xgb_model])
 
-    endpoint_name = 'inference-pipeline-endpoint-' + timestamp
+    endpoint_name = 'inference-pipeline-endpoint-' + timestamp_prefix
 
     sm_model.deploy(initial_instance_count=1,
                     instance_type='ml.c4.xlarge', endpoint_name=endpoint_name)
