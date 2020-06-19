@@ -1,4 +1,3 @@
-import sagemaker
 from sagemaker.pipeline import PipelineModel
 from sagemaker.sparkml.model import SparkMLModel
 from sagemaker.model import Model
@@ -8,7 +7,7 @@ import sys
 import schema_utils
 from sagemaker.amazon.amazon_estimator import get_image_uri
 
-sm = boto3.client("sagemaker", region_name="us-west-2")
+sm = boto3.client("sagemaker", region_name="us-east-1")
 
 def inference_pipeline_ep(role, sess, spark_model_uri, timestamp, **context):
     s3_sparkml_data_uri = spark_model_uri
