@@ -41,16 +41,16 @@ config["inference_pipeline"] = {
 }
 
 config["batch_transform"] = {
-    "transform_config": {
+    "transformer_config": {
         "instance_count": 1,
         "instance_type": "ml.c4.xlarge",
-        "data": "s3://"+bucket+"/prepare/test/",
-        "data_type": "S3Prefix",
-        "content_type": "application/x-recordio-protobuf",
-        "strategy": "MultiRecord",
-        "output_path": "s3://"+bucket+"/transform/"
     },
-    "inputs": "s3://"+bucket+"/sagemaker/spark-preprocess/inputs/raw/abalone/abalone.csv",
-    "input_filter": "$[1:]",
-    "model_name": "inference-pipeline-spark-xgboost"
+    "transform_config": {
+        "data": "s3://"+bucket+"/sagemaker/spark-preprocess/inputs/raw/abalone/abalone.csv",
+        "data_type": "S3Prefix",
+        "content_type": "text/csv",
+        "split_type": "Line",
+        "input_filter": "$[1:]"
+    },
+    "model_name": "inference-pipeline-spark-xgboost-time"
 }

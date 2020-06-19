@@ -104,19 +104,16 @@ train_config = training_config(
 # Batch inference
 
 xgb_transformer = Transformer(
-    model_name=config['batch_transform']['model_name'],
-    instance_count=1,
-    instance_type='ml.c5.xlarge',
-    sagemaker_session=sagemaker.session.Session(sess)
+    model_name=config['batch_transform']['model_name'].replace(
+        "time", timestamp, 1),
+    sagemaker_session=sagemaker.session.Session(sess),
+    **config['batch_transform']['transformer_config']
 )
 
 transform_config = transform_config(
     transformer=xgb_transformer,
     job_name='xgb-tranform-job-'+timestamp,
-    data=config['batch_transform']['inputs'],
-    content_type='text/csv',
-    split_type='Line',
-    data_type='S3Prefix'
+    **config['batch_transform']['transform_config']
 )
 
 # =============================================================================
