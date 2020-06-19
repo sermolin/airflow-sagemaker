@@ -35,6 +35,3 @@ def sm_proc_job(role, sess, bucket, **context):
 
     spark_processor.run(code=code_uri, arguments=["s3_input_bucket", bucket, "s3_input_key_prefix", input_prefix, "s3_output_bucket",
                                                   bucket, "s3_output_key_prefix", input_preprocessed_prefix, "s3_model_bucket", bucket, "s3_model_prefix", model_prefix], logs=True)
-
-
-export AIRFLOW_VAR_TIMESTAMP = timestamp_prefix
