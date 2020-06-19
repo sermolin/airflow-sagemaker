@@ -5,7 +5,7 @@ from datetime import datetime
 
 # airflow operators
 import airflow
-from airflow.models import DAG
+from airflow.models import DAG, Variable
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 
@@ -89,11 +89,12 @@ xgb_estimator = Estimator(
 )
 
 # train_config specifies SageMaker training configuration
+timestamp = Variable.get("timestamp")
 
 train_data = create_s3_input(
-    config['train_model']['inputs']['train'])
+    config['train_model']['inputs']['train'].replace("time", timestamp, 1))
 validation_data = create_s3_input(
-    config['train_model']['inputs']['validation'])
+    config['train_model']['inputs']['validation'].replace("time", timestamp, 1))
 data_channels = {'train': train_data, 'validation': validation_data}
 
 train_config = training_config(
@@ -168,7 +169,7 @@ inference_pipeline_task = PythonOperator(
     dag=dag,
     python_callable=inference_pipeline_ep.inference_pipeline_ep,
     op_kwargs={'role': role, 'sess': sess,
-               'spark_model_uri': config['inference_pipeline']['inputs']['spark_model'], 'bucket': config['bucket']}
+               'spark_model_uri': config['inference_pipeline']['inputs']['spark_model'], 'bucket': config['bucket'], 'timestamp_prefix': timestamp}
 )
 
 # launch sagemaker batch transform job and wait until it completes
