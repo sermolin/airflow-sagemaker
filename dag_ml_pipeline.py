@@ -112,7 +112,7 @@ xgb_transformer = Transformer(
 
 transform_config = transform_config(
     transformer=xgb_transformer,
-    job_name='xgb-tranform-job',
+    job_name='xgb-tranform-job-'+timestamp,
     data=config['batch_transform']['inputs'],
     content_type='text/csv',
     split_type='Line',
