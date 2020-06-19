@@ -35,8 +35,8 @@ config["train_model"] = {
         }
     },
     "inputs": {
-        "train": "s3://"+bucket+"/sagemaker/spark-preprocess/input/preprocessed/abalone/"+timestamp_prefix+"train/part-00000",
-        "validation": "s3://"+bucket+"/sagemaker/spark-preprocess/input/preprocessed/"+timestamp_prefix+"/abalone/validation/part-00000"  # replace
+        "train": "s3://"+bucket+"/sagemaker/spark-preprocess/inputs/preprocessed/abalone/"+timestamp_prefix+"train/part-00000",
+        "validation": "s3://"+bucket+"/sagemaker/spark-preprocess/inputs/preprocessed/"+timestamp_prefix+"/abalone/validation/part-00000"  # replace
     }
 }
 
