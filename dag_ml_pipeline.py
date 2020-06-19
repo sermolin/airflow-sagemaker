@@ -42,8 +42,8 @@ from sagemaker.workflow.airflow import deploy_config
 
 # ml workflow specific
 
-from pipeline.sm_proc_job import sm_proc_job
-from pipeline.inference_pipeline_ep import inference_pipeline_ep
+from pipeline import sm_proc_job
+from pipeline import inference_pipeline_ep
 import config as cfg
 
 
@@ -161,7 +161,7 @@ sm_proc_job_task = PythonOperator(
     task_id='sm_proc_job',
     dag=dag,
     provide_context=True,
-    python_callable=sm_proc_job,
+    python_callable=sm_proc_job.sm_proc_job,
     op_kwargs={'role': role, 'sess': sess, 'timestamp': config['timestamp']})
 
 # Train xgboost model task
@@ -178,7 +178,7 @@ train_model_task = SageMakerTrainingOperator(
 inference_pipeline_task = PythonOperator(
     task_id='inference_pipeline',
     dag=dag,
-    python_callable=inference_pipeline_ep,
+    python_callable=inference_pipeline_ep.inference_pipeline_ep,
     op_kwargs={'role': role, 'sess': sess,
                'spark_model_uri': config['inference_pipeline']['inputs']['spark_model']}
 )
