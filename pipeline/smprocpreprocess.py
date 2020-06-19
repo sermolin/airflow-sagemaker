@@ -86,6 +86,8 @@ def main():
             args['s3_output_bucket'], args['s3_output_key_prefix'], 'train', 'part-00000')
         s3.head_object(Bucket=args['s3_output_bucket'], Key=key)
         s3.delete_object(Bucket=args['s3_output_bucket'], Key=key)
+    except botocore.exceptions.ClientError as e:
+        pass
     else:
         pass
     train_lines.saveAsTextFile(
