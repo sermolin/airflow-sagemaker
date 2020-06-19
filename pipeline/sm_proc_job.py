@@ -10,7 +10,7 @@ def sm_proc_job(role, sess, timestamp, **context):
     bucket = "airflow-sagemaker-jeprk"
 
     prefix = "sagemaker/spark-preprocess-demo/"
-    input_prefix = prefix + "input/raw/abalone'
+    input_prefix = prefix + "input/raw/abalone"
     input_preprocessed_prefix = prefix + "/input/preprocessed/"+timestamp+"/abalone"
     model_prefix = prefix + "model/spark/"+timestamp
 
