@@ -25,6 +25,7 @@ def sm_proc_job(role, sess, timestamp, bucket, **context):
                                       instance_type="ml.r5.xlarge",
                                       max_runtime_in_seconds=1200,
                                       env={"mode": "python"})
+    code_uri = "s3://"+bucket+"/code/smprocpreprocess.py"
 
-    spark_processor.run(code="s3://airflow-sagemaker-jeprk/code/smprocpreprocess.py", arguments=["s3_input_bucket", bucket, "s3_input_key_prefix", input_prefix,
-                                                                                                 "s3_output_bucket", bucket, "s3_output_key_prefix", input_preprocessed_prefix, "s3_model_bucket", bucket, "s3_model_prefix", model_prefix], logs=True)
+    spark_processor.run(code=code_uri, arguments=["s3_input_bucket", bucket, "s3_input_key_prefix", input_prefix, "s3_output_bucket",
+                                                  bucket, "s3_output_key_prefix", input_preprocessed_prefix, "s3_model_bucket", bucket, "s3_model_prefix", model_prefix], logs=True)
