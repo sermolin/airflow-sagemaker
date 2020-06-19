@@ -169,7 +169,7 @@ inference_pipeline_task = PythonOperator(
     dag=dag,
     python_callable=inference_pipeline_ep.inference_pipeline_ep,
     op_kwargs={'role': role, 'sess': sess,
-               'spark_model_uri': config['inference_pipeline']['inputs']['spark_model'], 'bucket': config['bucket'], 'timestamp_prefix': timestamp}
+               'spark_model_uri': config['inference_pipeline']['inputs']['spark_model'].replace('time', timestamp, 1), 'bucket': config['bucket'], 'timestamp_prefix': timestamp}
 )
 
 # launch sagemaker batch transform job and wait until it completes
