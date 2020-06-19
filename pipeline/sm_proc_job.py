@@ -1,4 +1,5 @@
 # sm_proc_job.py
+import sagemaker
 from sagemaker.processing import ScriptProcessor, ProcessingInput
 import boto3
 import os

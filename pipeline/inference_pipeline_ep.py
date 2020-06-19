@@ -1,3 +1,4 @@
+import sagemaker
 from sagemaker.pipeline import PipelineModel
 from sagemaker.sparkml.model import SparkMLModel
 from sagemaker.model import Model
