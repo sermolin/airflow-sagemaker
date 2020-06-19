@@ -1,7 +1,8 @@
 from time import gmtime, strftime
-import time
 
-timestamp_prefix = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+if timestamp_prefix not in locals():
+    timestamp_prefix = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+
 bucket = 'airflow-sm-jeprk'
 
 config = {}
@@ -42,7 +43,7 @@ config["train_model"] = {
 
 config["inference_pipeline"] = {
     "inputs": {
-        "spark_model": "s3://"+bucket+"/sagemaker/spark-preprocess/model/spark/"+timestamp_prefix+"model.tar.gz"
+        "spark_model": "s3://"+bucket+"/sagemaker/spark-preprocess/model/spark/"+timestamp_prefix+"/model.tar.gz"
     }
 }
 
