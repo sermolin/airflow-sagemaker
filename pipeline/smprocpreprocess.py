@@ -7,8 +7,9 @@ import os
 import shutil
 import csv
 import boto3
-
+import botocore
 import pyspark
+
 from pyspark.sql import SparkSession
 from pyspark.ml import Pipeline
 from pyspark.sql.types import StructField, StructType, StringType, DoubleType
@@ -24,7 +25,7 @@ def csv_line(data):
 
 def main():
     spark = SparkSession.builder.appName("PySparkAbalone").getOrCreate()
-
+    s3 = boto3.resource('s3')
     # Convert command line args into a map of args
     args_iter = iter(sys.argv[1:])
     args = dict(zip(args_iter, args_iter))
@@ -80,6 +81,13 @@ def main():
     # Convert the train dataframe to RDD to save in CSV format and upload to S3
     train_rdd = train_df.rdd.map(lambda x: (x.rings, x.features))
     train_lines = train_rdd.map(csv_line)
+    try:
+        key = os.path.join(
+            args['s3_output_bucket'], args['s3_output_key_prefix'], 'train', 'part-00000')
+        s3.head_object(Bucket=args['s3_output_bucket'], Key=key)
+        s3.delete_object(Bucket=args['s3_output_bucket'], Key=key)
+    else:
+        pass
     train_lines.saveAsTextFile(
         's3a://' + os.path.join(args['s3_output_bucket'], args['s3_output_key_prefix'], 'train'))
 
@@ -104,7 +112,7 @@ def main():
         tar.add("/opt/ml/model/root", arcname='root')
 
     # Upload the model in tar.gz format to S3 so that it can be used with SageMaker for inference later
-    s3 = boto3.resource('s3')
+
     file_name = os.path.join(args['s3_model_prefix'], 'model.tar.gz')
     s3.Bucket(args['s3_model_bucket']).upload_file(
         '/opt/ml/model.tar.gz', file_name)
