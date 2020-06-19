@@ -1,10 +1,4 @@
-from time import gmtime, strftime
-
-try:
-    timestamp_prefix
-except NameError:
-    timestamp_prefix = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
-
+timestamp_prefix = 'time'
 bucket = 'airflow-sm-jeprk'
 
 config = {}
@@ -13,8 +7,6 @@ config["job_level"] = {
     "region_name": "us-east-1",
     "run_hyperparameter_opt": "no"
 }
-
-config["timestamp"] = timestamp_prefix
 
 config["bucket"] = bucket
 
