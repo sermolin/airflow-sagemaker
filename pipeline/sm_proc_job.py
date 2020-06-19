@@ -8,7 +8,7 @@ import sys
 
 def sm_proc_job(role, sess, timestamp, bucket, **context):
 
-    prefix = "sagemaker/spark-preprocess-demo/"
+    prefix = "sagemaker/spark-preprocess/"
     input_prefix = prefix + "inputs/raw/abalone"
     input_preprocessed_prefix = prefix + "/inputs/preprocessed/"+timestamp+"/abalone"
     model_prefix = prefix + "model/spark/"+timestamp
