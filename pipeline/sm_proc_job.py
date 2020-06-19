@@ -4,13 +4,17 @@ from sagemaker.processing import ScriptProcessor, ProcessingInput
 import boto3
 import os
 import sys
+from time import gmtime, strftime
+
+timestamp_prefix = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
 
 def sm_proc_job(role, sess, bucket, **context):
 
     prefix = "sagemaker/spark-preprocess/"
     input_prefix = prefix + "inputs/raw/abalone"
-    input_preprocessed_prefix = prefix + "/inputs/preprocessed/abalone"
+    input_preprocessed_prefix = prefix + \
+        "/inputs/preprocessed/abalone/" + timestamp_prefix
     model_prefix = prefix + "model/spark/"
 
     spark_repository_uri = "154727479023.dkr.ecr.us-east-1.amazonaws.com/sagemaker-spark-example"
@@ -29,3 +33,6 @@ def sm_proc_job(role, sess, bucket, **context):
 
     spark_processor.run(code=code_uri, arguments=["s3_input_bucket", bucket, "s3_input_key_prefix", input_prefix, "s3_output_bucket",
                                                   bucket, "s3_output_key_prefix", input_preprocessed_prefix, "s3_model_bucket", bucket, "s3_model_prefix", model_prefix], logs=True)
+
+
+export AIRFLOW_VAR_TIMESTAMP = timestamp_prefix

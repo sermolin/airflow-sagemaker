@@ -81,30 +81,12 @@ def main():
     # Convert the train dataframe to RDD to save in CSV format and upload to S3
     train_rdd = train_df.rdd.map(lambda x: (x.rings, x.features))
     train_lines = train_rdd.map(csv_line)
-    try:
-        key = os.path.join(
-            args['s3_output_bucket'], args['s3_output_key_prefix'], 'train', 'part-00000')
-        s3.head_object(Bucket=args['s3_output_bucket'], Key=key)
-        s3.delete_object(Bucket=args['s3_output_bucket'], Key=key)
-    except botocore.exceptions.ClientError as e:
-        pass
-    else:
-        pass
     train_lines.saveAsTextFile(
         's3a://' + os.path.join(args['s3_output_bucket'], args['s3_output_key_prefix'], 'train'))
 
     # Convert the validation dataframe to RDD to save in CSV format and upload to S3
     validation_rdd = validation_df.rdd.map(lambda x: (x.rings, x.features))
     validation_lines = validation_rdd.map(csv_line)
-    try:
-        key = os.path.join(
-            args['s3_output_bucket'], args['s3_output_key_prefix'], 'validation', 'part-00000')
-        s3.head_object(Bucket=args['s3_output_bucket'], Key=key)
-        s3.delete_object(Bucket=args['s3_output_bucket'], Key=key)
-    except botocore.exceptions.ClientError as e:
-        pass
-    else:
-        pass
     validation_lines.saveAsTextFile(
         's3a://' + os.path.join(args['s3_output_bucket'], args['s3_output_key_prefix'], 'validation'))
 

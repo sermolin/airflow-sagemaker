@@ -5,7 +5,7 @@ from datetime import datetime
 
 # airflow operators
 import airflow
-from airflow.models import DAG
+from airflow.models import DAG, Variable
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 
@@ -50,18 +50,6 @@ import config as cfg
 # =============================================================================
 
 
-def is_hpo_enabled():
-    """check if hyper-parameter optimization is enabled in the config
-    """
-    hpo_enabled = False
-    if "job_level" in config and \
-            "run_hyperparameter_opt" in config["job_level"]:
-        run_hpo_config = config["job_level"]["run_hyperparameter_opt"]
-        if run_hpo_config.lower() == "yes":
-            hpo_enabled = True
-    return hpo_enabled
-
-
 def get_sagemaker_role_arn(role_name, region_name):
     iam = boto3.client('iam', region_name=region_name)
     response = iam.get_role(RoleName=role_name)
@@ -102,10 +90,12 @@ xgb_estimator = Estimator(
 
 # train_config specifies SageMaker training configuration
 
+timestamp = Variable.get("TIMESTAMP")
+
 train_data = create_s3_input(
-    config['train_model']['inputs']['train'])
+    config['train_model']['inputs']['train'].replace('time', timestamp, 1))
 validation_data = create_s3_input(
-    config['train_model']['inputs']['validation'])
+    config['train_model']['inputs']['validation'].replace('time', timestamp, 1))
 data_channels = {'train': train_data, 'validation': validation_data}
 
 train_config = training_config(
