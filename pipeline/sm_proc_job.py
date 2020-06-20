@@ -7,12 +7,8 @@ import sys
 from time import gmtime, strftime
 from airflow.models import Variable
 
-current_time = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
-timestamp_prefix = current_time
-
-
 def sm_proc_job(role, sess, bucket, **context):
-    timestamp = Variable.set("timestamp", timestamp_prefix)
+    timestamp_prefix = Variable.get("timestamp")
 
     prefix = "sagemaker/spark-preprocess/"
     input_prefix = prefix + "inputs/raw/abalone"

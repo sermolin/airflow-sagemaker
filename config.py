@@ -1,3 +1,12 @@
+from airflow.models import Variable
+
+timestamp = ""
+
+try:
+    timestamp = Variable.get("timestamp")
+except:
+    pass
+
 bucket = 'airflow-sm-jeprk'
 
 config = {}
@@ -29,14 +38,14 @@ config["train_model"] = {
         }
     },
     "inputs": {
-        "train": "s3://"+bucket+"/sagemaker/spark-preprocess/inputs/preprocessed/abalone/time/train/part-00000",
-        "validation": "s3://"+bucket+"/sagemaker/spark-preprocess/inputs/preprocessed/abalone/time/validation/part-00000"  # replace
+        "train": "s3://"+bucket+"/sagemaker/spark-preprocess/inputs/preprocessed/abalone/"+timestamp+"/train/part-00000",
+        "validation": "s3://"+bucket+"/sagemaker/spark-preprocess/inputs/preprocessed/abalone/"+timestamp+"/validation/part-00000"  # replace
     }
 }
 
 config["inference_pipeline"] = {
     "inputs": {
-        "spark_model": "s3://"+bucket+"/sagemaker/spark-preprocess/model/spark/time/model.tar.gz"
+        "spark_model": "s3://"+bucket+"/sagemaker/spark-preprocess/model/spark/"+timestamp+"/model.tar.gz"
     }
 }
 
@@ -44,7 +53,7 @@ config["batch_transform"] = {
     "transformer_config": {
         "instance_count": 1,
         "instance_type": "ml.c4.xlarge",
-        "output_path": "s3://" + bucket + "/sagemaker/spark-preprocess/batch_output"
+        "output_path": "s3://" + bucket + "/sagemaker/spark-preprocess/batch_output/xgb-transform/" +timestamp
     },
     "transform_config": {
         "data": "s3://"+bucket+"/sagemaker/spark-preprocess/inputs/raw/abalone/abalone.csv",
@@ -53,5 +62,5 @@ config["batch_transform"] = {
         "split_type": "Line",
         "input_filter": "$[:-1]",
     },
-    "model_name": "inference-pipeline-spark-xgboost-time"
+    "model_name": "inference-pipeline-spark-xgboost-"+timestamp
 }

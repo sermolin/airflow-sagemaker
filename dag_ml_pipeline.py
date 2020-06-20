@@ -43,6 +43,7 @@ from sagemaker.workflow.airflow import deploy_config
 
 # ml workflow specific
 from pipeline import inference_pipeline_ep, sm_proc_job
+from time import gmtime, strftime
 import config as cfg
 
 # =============================================================================
@@ -60,6 +61,10 @@ def create_s3_input(s3_data):
     data = sagemaker.session.s3_input(
         s3_data, distribution='FullyReplicated',  content_type='text/csv', s3_data_type='S3Prefix')
     return data
+
+def set_timestamp():
+    timestamp_prefix = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+    Variable.set("timestamp", timestamp_prefix)
 
 # =============================================================================
 # setting up training, tuning and transform configuration
@@ -89,12 +94,11 @@ xgb_estimator = Estimator(
 )
 
 # train_config specifies SageMaker training configuration
-timestamp = Variable.get("timestamp")
 
 train_data = create_s3_input(
-    config['train_model']['inputs']['train'].replace("time", timestamp, 1))
+    config['train_model']['inputs']['train'])
 validation_data = create_s3_input(
-    config['train_model']['inputs']['validation'].replace("time", timestamp, 1))
+    config['train_model']['inputs']['validation'])
 data_channels = {'train': train_data, 'validation': validation_data}
 
 train_config = training_config(
@@ -104,8 +108,7 @@ train_config = training_config(
 # Batch inference
 
 xgb_transformer = Transformer(
-    model_name=config['batch_transform']['model_name'].replace(
-        "time", timestamp, 1),
+    model_name=config['batch_transform']['model_name'],
     sagemaker_session=sagemaker.session.Session(sess),
     **config['batch_transform']['transformer_config']
 )
@@ -136,38 +139,39 @@ dag = DAG(
 
 # Set the tasks in the DAG
 
-# # Dummy start operator
-# init = DummyOperator(
-#     task_id='start',
-#     dag=dag
-# )
+# Start operator
+init = PythonOperator(
+    task_id='set_timestamp',
+    dag=dag,
+    provide_context=False,
+    python_callable=set_timestamp)
 
-# # SageMaker processing job task
-# sm_proc_job_task = PythonOperator(
-#     task_id='sm_proc_job',
-#     dag=dag,
-#     provide_context=True,
-#     python_callable=sm_proc_job.sm_proc_job,
-#     op_kwargs={'role': role, 'sess': sess, 'bucket': config['bucket']})
+# SageMaker processing job task
+sm_proc_job_task = PythonOperator(
+    task_id='sm_proc_job',
+    dag=dag,
+    provide_context=True,
+    python_callable=sm_proc_job.sm_proc_job,
+    op_kwargs={'role': role, 'sess': sess, 'bucket': config['bucket']})
 
-# # Train xgboost model task
-# train_model_task = SageMakerTrainingOperator(
-#     task_id='xgboost_model_training',
-#     dag=dag,
-#     config=train_config,
-#     aws_conn_id='airflow-sagemaker',
-#     wait_for_completion=True,
-#     check_interval=30
-# )
+# Train xgboost model task
+train_model_task = SageMakerTrainingOperator(
+    task_id='xgboost_model_training',
+    dag=dag,
+    config=train_config,
+    aws_conn_id='airflow-sagemaker',
+    wait_for_completion=True,
+    check_interval=30
+)
 
-# # Inference pipeline endpoint task
-# inference_pipeline_task = PythonOperator(
-#     task_id='inference_pipeline',
-#     dag=dag,
-#     python_callable=inference_pipeline_ep.inference_pipeline_ep,
-#     op_kwargs={'role': role, 'sess': sess,
-#                'spark_model_uri': config['inference_pipeline']['inputs']['spark_model'].replace('time', timestamp, 1), 'bucket': config['bucket'], 'timestamp_prefix': timestamp}
-# )
+# Inference pipeline endpoint task
+inference_pipeline_task = PythonOperator(
+    task_id='inference_pipeline',
+    dag=dag,
+    python_callable=inference_pipeline_ep.inference_pipeline_ep,
+    op_kwargs={'role': role, 'sess': sess,
+               'spark_model_uri': config['inference_pipeline']['inputs']['spark_model'], 'bucket': config['bucket'], 'timestamp_prefix': timestamp}
+)
 
 # launch sagemaker batch transform job and wait until it completes
 batch_transform_task = SageMakerTransformOperator(
@@ -178,22 +182,14 @@ batch_transform_task = SageMakerTransformOperator(
     wait_for_completion=True,
     check_interval=30)
 
-# # Cleanup task
-# cleanup_task = DummyOperator(
-#     task_id='cleaning_up',
-#     dag=dag)
+# Cleanup task
+cleanup_task = DummyOperator(
+    task_id='cleaning_up',
+    dag=dag)
 
-# init.set_downstream(sm_proc_job_task)
-# sm_proc_job_task.set_downstream(train_model_task)
-# train_model_task.set_downstream(inference_pipeline_task)
-# inference_pipeline_task.set_downstream(batch_transform_task)
-# batch_transform_task.set_downstream(cleanup_task)
+init.set_downstream(sm_proc_job_task)
+sm_proc_job_task.set_downstream(train_model_task)
+train_model_task.set_downstream(inference_pipeline_task)
+inference_pipeline_task.set_downstream(batch_transform_task)
+batch_transform_task.set_downstream(cleanup_task)
 
-# test DELETE LATER
-
-init = DummyOperator(
-    task_id='start',
-    dag=dag
-)
-
-init.set_downstream(batch_transform_task)
