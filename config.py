@@ -16,6 +16,8 @@ config["job_level"] = {
     "run_hyperparameter_opt": "no"
 }
 
+config["spark_repo_uri"]="154727479023.dkr.ecr.us-east-1.amazonaws.com/sagemaker-spark-example"
+
 config["bucket"] = bucket
 
 config["train_model"] = {

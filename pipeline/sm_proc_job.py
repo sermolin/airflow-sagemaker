@@ -7,7 +7,7 @@ import sys
 from time import gmtime, strftime
 from airflow.models import Variable
 
-def sm_proc_job(role, sess, bucket, **context):
+def sm_proc_job(role, sess, bucket, spark_repo_uri, **context):
     timestamp_prefix = Variable.get("timestamp")
 
     prefix = "sagemaker/spark-preprocess/"
@@ -16,10 +16,8 @@ def sm_proc_job(role, sess, bucket, **context):
         "/inputs/preprocessed/abalone/" + timestamp_prefix
     model_prefix = prefix + "model/spark/" + timestamp_prefix
 
-    spark_repository_uri = "154727479023.dkr.ecr.us-east-1.amazonaws.com/sagemaker-spark-example"
-
     spark_processor = ScriptProcessor(base_job_name="spark-preprocessor",
-                                      image_uri=spark_repository_uri,
+                                      image_uri=spark_repo_uri,
                                       command=["/opt/program/submit"],
                                       role=role,
                                       sagemaker_session=sagemaker.Session(
