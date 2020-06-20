@@ -51,6 +51,7 @@ config["batch_transform"] = {
         "content_type": "text/csv",
         "split_type": "Line",
         "input_filter": "$[:-1]",
+        "output_path": "s3://" + bucket + "/sagemaker/spark-preprocess/batch_output"
     },
     "model_name": "inference-pipeline-spark-xgboost-time"
 }
