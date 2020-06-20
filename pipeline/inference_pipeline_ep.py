@@ -31,7 +31,7 @@ def inference_pipeline_ep(role, sess, spark_model_uri, bucket, timestamp_prefix,
     xgb_model = Model(model_data=s3_xgboost_model_uri, role=role,
                       sagemaker_session=sagemaker.session.Session(sess), image=xgb_container)
 
-    pipeline_model_name = 'inference-pipeline-spark-xgboost'
+    pipeline_model_name = 'inference-pipeline-spark-xgboost-' + timestamp_prefix
 
     sm_model = PipelineModel(name=pipeline_model_name,
                              role=role,
