@@ -191,4 +191,9 @@ batch_transform_task = SageMakerTransformOperator(
 
 # test DELETE LATER
 
+init = DummyOperator(
+    task_id='start',
+    dag=dag
+)
+
 init.set_downstream(batch_transform_task)
