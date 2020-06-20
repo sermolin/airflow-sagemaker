@@ -50,7 +50,7 @@ config["batch_transform"] = {
         "data_type": "S3Prefix",
         "content_type": "text/csv",
         "split_type": "Line",
-        "input_filter": "$[1:]",
+        "input_filter": "$[:-1]",
     },
     "model_name": "inference-pipeline-spark-xgboost-time"
 }
