@@ -61,6 +61,7 @@ config["batch_transform"] = {
         "content_type": "text/csv",
         "split_type": "Line",
         "input_filter": "$[:-1]",
+        "job_name": "xgb-transform-job-"+timestamp
     },
     "model_name": "inference-pipeline-spark-xgboost-"+timestamp
 }

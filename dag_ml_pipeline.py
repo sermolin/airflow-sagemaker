@@ -115,7 +115,6 @@ xgb_transformer = Transformer(
 
 transform_config = transform_config(
     transformer=xgb_transformer,
-    job_name='xgb-tranform-job-'+timestamp,
     **config['batch_transform']['transform_config']
 )
 
