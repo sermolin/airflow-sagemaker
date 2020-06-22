@@ -2,6 +2,7 @@ from airflow.models import Variable
 import time
 from time import gmtime, strftime
 import os
+import subprocess
 import boto3
 
 s3 = boto3.client('s3')
