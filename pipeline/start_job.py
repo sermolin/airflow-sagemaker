@@ -1,4 +1,5 @@
-from airflow.models import DAG, Variable
+from airflow.models import DAG,
+import time
 from time import gmtime, strftime
 import boto3
 import config as cfg
@@ -13,3 +14,4 @@ def start(bucket):
         Bucket=bucket, Key='sagemaker/spark-preprocess/inputs/raw/abalone/abalone.csv', Filename='/abalone.csv')
     s3.upload_file(Bucket=bucket, Key='code/smprocpreprocess.py',
                    Filename='/smprocpreprocess.py')
+    time.sleep(10)
