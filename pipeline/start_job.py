@@ -19,7 +19,8 @@ def find_all(name, path):
 def start(bucket):
     timestamp_prefix = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
     Variable.set("timestamp", timestamp_prefix)
-    find_all('smprocpreprocess.py', os.getcwd())
+    print(os.getcwd())
+
     # s3.put_object(
     #     Bucket=bucket, Key='sagemaker/spark-preprocess/inputs/raw/abalone/abalone.csv', Body=abalone.csv)
     # s3.put_object(Bucket=bucket, Key='code/smprocpreprocess.py',
