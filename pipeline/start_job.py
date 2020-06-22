@@ -1,4 +1,4 @@
-from airflow.models import DAG,
+from airflow.models import Variable
 import time
 from time import gmtime, strftime
 import boto3
