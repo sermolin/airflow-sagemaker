@@ -139,8 +139,7 @@ init = PythonOperator(
     task_id='start_job',
     dag=dag,
     provide_context=False,
-    python_callable=start_job.start,
-    op_kwargs={'bucket': config['bucket']})
+    python_callable=start_job.start)
 
 # SageMaker processing job task
 sm_proc_job_task = PythonOperator(
