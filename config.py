@@ -16,7 +16,7 @@ config["job_level"] = {
     "run_hyperparameter_opt": "no"
 }
 
-config["spark_repo_uri"]="154727479023.dkr.ecr.us-east-1.amazonaws.com/sagemaker-spark-example"
+config["spark_repo_uri"] = "154727479023.dkr.ecr.us-east-1.amazonaws.com/sagemaker-spark-example"
 
 config["bucket"] = bucket
 
@@ -55,7 +55,7 @@ config["batch_transform"] = {
     "transformer_config": {
         "instance_count": 1,
         "instance_type": "ml.c4.xlarge",
-        "output_path": "s3://" + bucket + "/sagemaker/spark-preprocess/batch_output/xgb-transform/" +timestamp
+        "output_path": "s3://" + bucket + "/sagemaker/spark-preprocess/batch_output/xgb-transform/" + timestamp
     },
     "transform_config": {
         "data": "s3://"+bucket+"/sagemaker/spark-preprocess/inputs/raw/abalone/abalone.csv",
