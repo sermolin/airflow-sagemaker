@@ -7,6 +7,7 @@ import sys
 from time import gmtime, strftime
 from airflow.models import Variable
 
+
 def sm_proc_job(role, sess, bucket, spark_repo_uri, **context):
     timestamp_prefix = Variable.get("timestamp")
 

@@ -12,6 +12,7 @@ from airflow.models import Variable
 sm = boto3.client('sagemaker', region_name='us-east-1')
 timestamp_prefix = Variable.get("timestamp")
 
+
 def inference_pipeline_ep(role, sess, spark_model_uri, bucket, **context):
 
     s3_sparkml_data_uri = spark_model_uri
