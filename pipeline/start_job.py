@@ -11,5 +11,5 @@ def start(bucket):
     Variable.set("timestamp", timestamp_prefix)
     s3.put_object(
         Bucket=bucket, Key='sagemaker/spark-preprocess/inputs/raw/abalone/abalone.csv', Body='/abalone.csv')
-    s3.put_object(Bucket=bucket, key='code/smprocpreprocess.py',
+    s3.put_object(Bucket=bucket, Key='code/smprocpreprocess.py',
                   Body='/smprocpreprocess.py')
