@@ -8,21 +8,18 @@ import boto3
 s3 = boto3.client('s3')
 
 
-def find_files(file_name):
-    command = ['locate', file_name]
-
-    output = subprocess.Popen(command, stdout=subprocess.PIPE).communicate()[0]
-    output = output.decode()
-
-    search_results = output.split('\n')
-
-    return search_results
+def find_all(name, path):
+    result = []
+    for root, dirs, files in os.walk(path):
+        if name in files:
+            result.append(os.path.join(root, name))
+    return result
 
 
 def start(bucket):
     timestamp_prefix = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
     Variable.set("timestamp", timestamp_prefix)
-    find_files('smprocpreprocess.py')
+    find_all('smprocpreprocess.py', '/')
     # s3.put_object(
     #     Bucket=bucket, Key='sagemaker/spark-preprocess/inputs/raw/abalone/abalone.csv', Body=abalone.csv)
     # s3.put_object(Bucket=bucket, Key='code/smprocpreprocess.py',
