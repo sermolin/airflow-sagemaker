@@ -10,11 +10,11 @@ from sagemaker.amazon.amazon_estimator import get_image_uri
 from airflow.models import Variable
 
 sm = boto3.client('sagemaker', region_name='us-east-1')
-timestamp_prefix = Variable.get("timestamp")
+#timestamp_prefix = Variable.get("timestamp")
 
 
 def inference_pipeline_ep(role, sess, spark_model_uri, bucket, **context):
-
+    timestamp_prefix = Variable.get("timestamp")
     s3_sparkml_data_uri = spark_model_uri
     s3_xgboost_model = sm.list_training_jobs(MaxResults=1, StatusEquals='Completed', SortBy='CreationTime',
                                              NameContains='training-job-', SortOrder='Descending')['TrainingJobSummaries'][0]['TrainingJobName']
