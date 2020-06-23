@@ -7,7 +7,7 @@ try:
 except:
     pass
 
-bucket = 'airflow-sm-jeprk'
+bucket = 'airflow-sagemaker-2'
 
 config = {}
 
@@ -16,7 +16,9 @@ config["job_level"] = {
     "run_hyperparameter_opt": "no"
 }
 
-config["spark_repo_uri"] = "154727479023.dkr.ecr.us-east-1.amazonaws.com/sagemaker-spark-example"
+#config["spark_repo_uri"] = "328296961357.dkr.ecr.us-east-1.amazonaws.com/sagemaker-spark-example:latest"
+#config["spark_repo_uri"] = "154727479023.dkr.ecr.us-east-1.amazonaws.com/sagemaker-spark-example"
+config["spark_repo_uri"] = "328296961357.dkr.ecr.us-east-1.amazonaws.com/sagemaker-spark-c1-demo"
 
 config["bucket"] = bucket
 

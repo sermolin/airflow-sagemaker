@@ -124,7 +124,7 @@ args = {
 }
 
 dag = DAG(
-    'ml-pipeline-cof',
+    'sm-processing-3',
     default_args=args,
     schedule_interval=None,
     concurrency=1,
