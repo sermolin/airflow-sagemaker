@@ -118,7 +118,7 @@ Resources:
           echo "Installing s3fs"
           python -m pip install --upgrade s3fs --user
           echo "Installing sagemaker sdk"
-          python -m pip install sagemaker==v1.39.2 --user
+          python -m pip install sagemaker --user
           # Initialize Airflow
           airflow initdb
           # Update the RDS connection in the Airflow Config file
