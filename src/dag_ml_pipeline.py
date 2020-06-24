@@ -61,15 +61,6 @@ def create_s3_input(s3_data):
     return data
 
 
-def upload_to_s3(bucket, keys, file_paths):
-    s3 = boto3.client('s3')
-    input_key = keys[0]
-    input_file = file_paths[0]
-    preproc_key = keys[1]
-    preproc_file = file_paths[1]
-    s3.upload_file(Filename=input_file, Bucket=bucket, Key=input_key)
-    s3.upload_file(Filename=preproc_file, Bucket=bucket, Key=preproc_key)
-
 # =============================================================================
 # setting up training, tuning and transform configuration
 # =============================================================================
@@ -153,7 +144,7 @@ prepare_task = PythonOperator(
     task_id='prepare',
     dag=dag,
     provide_context=False,
-    python_callable=upload_to_s3,
+    python_callable=prepare.upload_to_s3,
     op_kwargs={'bucket': config['bucket'],
                'keys': config['keys'], 'file_paths': config['file_paths']}
 )
