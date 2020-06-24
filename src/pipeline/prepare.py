@@ -9,7 +9,7 @@ def set_timestamp():
 
 
 def upload_to_s3(bucket, keys, file_paths):
-    s3 = boto3.resource('s3')
+    s3 = boto3.client('s3')
     input_key = keys[0]
     input_file = file_paths[0]
     preproc_key = keys[1]
