@@ -7,12 +7,12 @@ try:
 except:
     pass
 
-bucket = '<s3-bucket>'
+bucket = 'airflow-sm-jeprk'
 
 config = {}
 
 config["job_level"] = {
-    "region_name": "<region-name>",
+    "region_name": "us-east-1",
     "run_hyperparameter_opt": "no"
 }
 

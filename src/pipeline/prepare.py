@@ -3,7 +3,7 @@ from time import gmtime, strftime
 import boto3
 
 
-def set_time():
+def set_timestamp():
     timestamp_prefix = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
     Variable.set("timestamp", timestamp_prefix)
 
