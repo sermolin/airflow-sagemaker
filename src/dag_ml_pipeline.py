@@ -135,7 +135,7 @@ dag = DAG(
 
 # Start operator
 init = PythonOperator(
-    task_id='set_timestamp',
+    task_id='start_job',
     dag=dag,
     provide_context=False,
     python_callable=prepare.start,
