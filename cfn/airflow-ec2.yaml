@@ -143,16 +143,16 @@ Resources:
           EOF
           python /tmp/airflow_conn.py
           # create directories
-          mkdir -p ~/airflow/dags/ml-pipeline-cof
+          mkdir -p ~/airflow/dags/sagemaker-ml-pipeline
           # clone the git repository
           cd ~
-          git clone -b jay-dev https://github.com/sermolin/airflow-sagemaker ml-pipeline-cof
-          cd ~/ml-pipeline-cof/src
+          git clone -b jay-dev https://github.com/sermolin/airflow-sagemaker sagemaker-ml-pipeline
+          cd ~/sagemaker-ml-pipeline/src
           # prepare airflow dag definition for sagemaker blog post
           sed -i 's/<s3-bucket>/${S3BucketName}/g' ./*.*
           sed -i 's/<region-name>/${AWS::Region}/g' ./*.*
           zip -r dag.zip *
-          cp dag.zip ~/airflow/dags/ml-pipeline-cof/dag.zip
+          cp dag.zip ~/airflow/dags/sagemaker-ml-pipeline/dag.zip
           cd -
           # Run Airflow webserver and scheduler
           airflow list_dags
