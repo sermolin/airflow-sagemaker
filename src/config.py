@@ -21,7 +21,7 @@ config["spark_repo_uri"] = "154727479023.dkr.ecr.us-east-1.amazonaws.com/sagemak
 config["bucket"] = bucket
 
 config["keys"] = ['sagemaker/spark-preprocess/inputs/raw/abalone/abalone.csv',
-                  'sagemaker/code/smprocpreprocess.py']
+                  'code/smprocpreprocess.py']
 
 config["file_paths"] = ['/root/ml-pipeline-cof/src/pipeline/abalone.csv',
                         '/root/ml-pipeline-cof/src/pipeline/smprocpreprocess.py']
