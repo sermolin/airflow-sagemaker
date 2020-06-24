@@ -123,7 +123,7 @@ args = {
 }
 
 dag = DAG(
-    'ml-pipeline-cof',
+    'sagemaker-ml-pipeline',
     default_args=args,
     schedule_interval=None,
     concurrency=1,
