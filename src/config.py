@@ -1,11 +1,9 @@
 from airflow.models import Variable
 
-timestamp = ""
-
 try:
     timestamp = Variable.get("timestamp")
 except:
-    pass
+    timestamp = ""
 
 bucket = '<s3-bucket>'
 
