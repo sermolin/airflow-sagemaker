@@ -40,7 +40,7 @@ from sagemaker.workflow.airflow import transform_config
 
 
 # ml workflow specific
-from pipeline import inference_pipeline_ep, sm_proc_job, prepare
+from ml_pipeline import inference_pipeline_ep, sm_proc_job, prepare
 from time import gmtime, strftime
 import config as cfg
 

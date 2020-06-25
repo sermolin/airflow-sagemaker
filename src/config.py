@@ -22,8 +22,8 @@ config["bucket"] = bucket
 config["keys"] = ['sagemaker/spark-preprocess/inputs/raw/abalone/abalone.csv',
                   'code/smprocpreprocess.py']
 
-config["file_paths"] = ['/root/sagemaker-ml-pipeline/src/pipeline/abalone.csv',
-                        '/root/sagemaker-ml-pipeline/src/pipeline/smprocpreprocess.py']
+config["file_paths"] = ['/root/sagemaker-ml-pipeline/src/ml_pipeline/abalone.csv',
+                        '/root/sagemaker-ml-pipeline/src/ml_pipeline/smprocpreprocess.py']
 
 config["train_model"] = {
     "sagemaker_role": "AirflowSageMakerExecutionRole",
